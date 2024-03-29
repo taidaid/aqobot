@@ -723,10 +723,10 @@ function base:cast()
     if mq.TLO.Me.SpellInCooldown() or self:isEnabled('DONTCAST') or mq.TLO.Me.Invis() then return end
     if state.medding and config.get('MEDCOMBAT') then return end
     --if assist.isFighting() and mq.TLO.Target.ID() ~= mq.TLO.Me.ID() then
-    if assist.isFighting() and (mq.TLO.Target.ID() == state.assistMobID or mq.TLO.Target.ID() == state.tankMobID or mode.currentMode:isManualMode()) then
+    if mq.TLO.Target.Type() == 'NPC' and assist.isFighting() and (mq.TLO.Target.ID() == state.assistMobID or mq.TLO.Target.ID() == state.tankMobID or mode.currentMode:isManualMode()) then
         if state.nuketimer:expired() then
             for _,clicky in ipairs(self.castClickies) do
-                if clicky.enabled and self:isAbilityEnabled(clicky.opt) and (clicky.DurationTotalSeconds == 0 or not mq.TLO.Target.Buff(clicky.CheckFor)()) and not mq.TLO.Me.Moving() then
+                if mq.TLO.Target.Type() == 'NPC' and clicky.enabled and self:isAbilityEnabled(clicky.opt) and (clicky.DurationTotalSeconds == 0 or not mq.TLO.Target.Buff(clicky.CheckFor)()) and not mq.TLO.Me.Moving() then
                     if clicky:use() then return end
                 end
             end

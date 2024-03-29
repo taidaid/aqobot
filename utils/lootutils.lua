@@ -117,7 +117,7 @@ There is also no flag for combat looting. It will only loot if no mobs are withi
 
 local mq = require 'mq'
 local success, Write = pcall(require, 'lib.Write')
-if not success then printf('\arERROR: Write.lua could not be loaded\n%s\ax', Write) end
+if not success then Write = nil end
 local eqServer = string.gsub(mq.TLO.EverQuest.Server(),' ','_')
 -- local guiLoot = require('loot_hist')
 local eqChar = mq.TLO.Me.Name()
@@ -128,7 +128,7 @@ local actors = require('actors')
 
 -- Public default settings, also read in from Loot.ini [Settings] section
 local loot = {
-    logger = Write,
+    logger = Write or {},
     Version = '"'..tostring(version)..'"',
     LootFile = mq.configDir .. '/Loot.ini',
     SettingsFile = mq.configDir.. '/LootNScoot_'..eqServer..'_'..eqChar..'.ini',
