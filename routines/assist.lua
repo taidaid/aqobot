@@ -283,7 +283,9 @@ function assist.engage()
         if config.get('ASSIST') == 'manual' then
             mq.cmdf('/squelch /stick snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
         else
-            mq.cmdf('/squelch /stick !front uw')
+            mq.cmdf('/squelch /stick %s', config.get('STICKCOMMAND'))
+            -- mq.cmdf('/squelch /stick snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
+            -- mq.cmdf('/squelch /stick !front uw')
         end
         stickTimer:reset()
     end
@@ -357,7 +359,9 @@ function assist.attack(skip_no_los)
         if config.get('ASSIST') == 'manual' then
             mq.cmdf('/squelch /stick snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
         else
-            mq.cmdf('/squelch /stick !front uw')
+            mq.cmdf('/squelch /stick %s', config.get('STICKCOMMAND'))
+            -- mq.cmdf('/squelch /stick hold snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
+            -- mq.cmdf('/squelch /stick !front uw')
         end
         stickTimer:reset()
     end

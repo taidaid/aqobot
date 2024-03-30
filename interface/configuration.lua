@@ -82,6 +82,14 @@ local config = {
         tlo = 'SwitchWithMA',
         tlotype = 'bool',
     },
+    STICKCOMMAND = {
+        value = '!front uw',
+        tip = 'Input to stick command for melee assisting',
+        label = 'Stick Command',
+        type = 'inputtext',
+        tlo = 'StickCommand',
+        tlotype = 'string',
+    },
     NUKEMANAMIN = {
         value = 15,
         tip = 'Minimum mana threshold to pause casting nukes',
@@ -551,7 +559,7 @@ function config.categories()
 end
 
 local configByCategory = {
-    Assist={'MODE','ASSIST','AUTOASSISTAT','ASSISTNAMES','SWITCHWITHMA','RESISTSTOPCOUNT','NUKEMANAMIN','DOTMANAMIN'},
+    Assist={'MODE','ASSIST','AUTOASSISTAT','ASSISTNAMES','SWITCHWITHMA','STICKCOMMAND','RESISTSTOPCOUNT','NUKEMANAMIN','DOTMANAMIN'},
     Camp={'CAMPRADIUS','CHASETARGET','CHASEDISTANCE','CHASEPAUSED'},
     Burn={'BURNALWAYS','BURNALLNAMED','BURNCOUNT','BURNPCT','USEGLYPH','USEINTENSITY'},
     Pull={'PULLRADIUS','PULLLOW','PULLHIGH','PULLMINLEVEL','PULLMAXLEVEL','PULLARC','GROUPWATCHWHO','GROUPSTAYCLOSE','PULLWITH'},

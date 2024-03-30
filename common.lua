@@ -269,7 +269,7 @@ function common.isBurnConditionMet(alwaysCondition)
             state.burnActive = true
             state.burn_type = nil
             return true
-        elseif config.get('BURNPCT') ~= 0 and mq.TLO.Target.PctHPs() < config.get('BURNPCT') then
+        elseif config.get('BURNPCT') ~= 0 and (mq.TLO.Target.PctHPs() or 100) < config.get('BURNPCT') then
             logger.info('\arActivating Burns (percent HP)\ax')
             state.burnActiveTimer:reset()
             state.burnActive = true

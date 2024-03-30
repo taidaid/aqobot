@@ -9,7 +9,7 @@ local camp = require('routines.camp')
 local pull = require('routines.pull')
 local helpers = require('utils.helpers')
 local logger = require('utils.logger')
-local lootutils = require('utils.lootutils')
+local guiLoot = require('interface.loot_hist')
 local constants = require('constants')
 local mode = require('mode')
 local state = require('state')
@@ -21,7 +21,6 @@ local spellRotationUIOpen, shouldDrawSpellRotationUI = false, false
 local abilityGUIOpen, shouldDrawAbilityGUI = false, false
 local clickyManagerOpen, shouldDrawClickyManager = false, false
 local helpGUIOpen, shouldDrawHelpGUI= false, false
-local lootGUIOpen, lootGUIShow = false, false
 
 -- UI constants
 local MINIMUM_WIDTH = 430
@@ -104,8 +103,8 @@ end
 
 -- Combine Assist and Camp categories
 local assistTabConfigs = {
-    'ASSIST','AUTOASSISTAT','ASSISTNAMES','SWITCHWITHMA',
-    'CAMPRADIUS','CHASETARGET','CHASEDISTANCE','CHASEPAUSED','RESISTSTOPCOUNT',
+    'ASSIST','AUTOASSISTAT','ASSISTNAMES','SWITCHWITHMA','CAMPRADIUS',
+    'STICKCOMMAND','CHASETARGET','CHASEDISTANCE','CHASEPAUSED','RESISTSTOPCOUNT',
     'NUKEMANAMIN','DOTMANAMIN','MAINTANK','LOOTMOBS','LOOTCOMBAT',
 }
 local function drawAssistTab()
@@ -255,6 +254,7 @@ local function drawDebugTab()
     end
     ImGui.SameLine()
     if ImGui.Button('View Loot', buttonWidth, BUTTON_HEIGHT) then
+        guiLoot.openGUI = not guiLoot.openGUI
         lootGUIOpen = true
     end
     ImGui.TextColored(YELLOW, 'Mode:')
@@ -786,70 +786,9 @@ local function drawHelpWindow()
                     ImGui.EndTable()
                 end
             end
-            --[[
-            if ImGui.TreeNode('Gear Check (WARNING*: Characters announce their gear to guild chat!') then
-                ImGui.TextColored(YELLOW, '/tell <name> gear <slotname>')
-                ImGui.TextColored(YELLOW, 'Slot Names')
-                ImGui.SameLine()
-                ImGui.Text(constants.slotList)
-                ImGui.TreePop()
-            end
-            if ImGui.TreeNode('Buff Begging  (WARNING*: Characters accounce requests to group or raid chat!') then
-                ImGui.TextColored(YELLOW, '/tell <name> <alias>')
-                ImGui.TextColored(YELLOW, 'Aliases:')
-                for alias,_ in pairs(class.requestAliases) do
-                    ImGui.Text(alias)
-                end
-                ImGui.TreePop()
-            end
-            ]]
         end
         ImGui.End()
     end
-end
-
-local function drawLootWindow()
-    if not lootGUIOpen then return end
-    lootGUIOpen, lootGUIShow = ImGui.Begin('Loot##aqoloot', lootGUIOpen)
-    if lootGUIShow then
-        if ImGui.Button('Clear') then lootutils.lootRecord = {} end
-        ImGui.SameLine()
-        if ImGui.Button('Hide Corpses') then mq.cmd('/hidecorpse looted') end
-        ImGui.SameLine()
-        if ImGui.Button('Unhide Corpses') then mq.cmd('/hidecorpse al') end
-        if ImGui.BeginTable('loottable', 5, TABLE_FLAGS) then
-            ImGui.TableSetupColumn('ID', ImGuiTableColumnFlags.None, 1)
-            ImGui.TableSetupColumn('Name', ImGuiTableColumnFlags.None, 3)
-            ImGui.TableSetupColumn('Action', ImGuiTableColumnFlags.None, 1)
-            ImGui.TableSetupColumn('Timestamp', ImGuiTableColumnFlags.None, 2)
-            ImGui.TableSetupColumn('##navtocorpse', ImGuiTableColumnFlags.None, 1)
-            ImGui.TableSetupScrollFreeze(0,1)
-            ImGui.TableHeadersRow()
-
-            local loot = lootutils.lootRecord
-            if loot and #loot > 0 then
-                for i=#loot,1,-1 do
-                    local entry = loot[i]
-                    ImGui.TableNextRow()
-                    ImGui.TableNextColumn()
-                    ImGui.Text('%s', entry.ID)
-                    ImGui.TableNextColumn()
-                    ImGui.TextColored(1, 0, 1, 1, '%s', entry.Name)
-                    if ImGui.IsItemHovered() and ImGui.IsMouseReleased(ImGuiMouseButton.Left) then
-                        mq.cmdf('/squelch /execute %s', entry.Link)
-                    end
-                    ImGui.TableNextColumn()
-                    ImGui.Text('%s', entry.Action)
-                    ImGui.TableNextColumn()
-                    ImGui.Text('%s',  os.date('%I:%M:%S', entry.LootedAt))
-                    ImGui.TableNextColumn()
-                    if ImGui.Button('Nav To##'..entry.ID..entry.Name) then mq.cmdf('/nav id %s', entry.ID) end
-                end
-            end
-            ImGui.EndTable()
-        end
-    end
-    ImGui.End()
 end
 
 -- ImGui main function for rendering the UI window
@@ -877,7 +816,6 @@ function ui.main()
     drawStateInspector()
     drawClickyManager()
     drawHelpWindow()
-    drawLootWindow()
     popStyles()
 end
 
