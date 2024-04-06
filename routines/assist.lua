@@ -155,6 +155,8 @@ function assist.getAssistSpawnIncludeManual()
     -- if mobs are on xtarget and 3sec timer is expired, try a manual assist to get target
     -- if the toon already has an npc on target (like something is hitting them), then that appears like the assist target too...
     if assistTarget == -1 then
+        -- Don't manual /assist if already on an assist target and switch with MA is false
+        if state.assistMobID > 0 and mq.TLO.Target.ID() == state.assistMobID and not config.get('SWITCHWITHMA') then return state.assistMobID end
         if mq.TLO.Me.XTarget() > 0 then
             if manualAssistTimer:expired() or not mq.TLO.Target() then
                 local assistNames = helpers.split(config.get('ASSISTNAMES'), ',')
