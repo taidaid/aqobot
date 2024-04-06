@@ -175,7 +175,7 @@ function Rogue:aggroClass()
     if mq.TLO.Me.AbilityReady('hide') then
         if mq.TLO.Me.Combat() then
             mq.cmd('/attack off')
-            mq.delay(1000, function() return not mq.TLO.Me.Combat() end)
+            mq.delay(1000)
         end
         mq.cmd('/doability hide')
         mq.delay(500, function() return mq.TLO.Me.Invis() end)

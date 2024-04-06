@@ -877,7 +877,7 @@ function base:aggro()
         end
     end
     -- 2. Is my aggro above some threshold? Use aggro reduction abilities
-    if mq.TLO.Target() and pctAggro >= 70 and mq.TLO.Target.Named() then
+    if mq.TLO.Target() and pctAggro >= 70 then
         if self.useCommonListProcessor then
             if common.processList(self.aggroReducers, self, true) then return end
         else
