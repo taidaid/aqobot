@@ -183,7 +183,7 @@ end
 function assist.checkMATargetSwitch(assistMobID)
     -- if we are targeting a mob, but the MA is targeting themself, then stop what we're doing
     if mq.TLO.Target.Type() == 'NPC' and assistMobID == assist.getAssistID() then
-        mq.cmd('/multiline ; /target clear; /pet back; /attack off; /autofire off;')
+        mq.cmd('/multiline ; /squelch /mqtarget clear; /pet back; /attack off; /autofire off;')
         state.assistMobID = 0
         return false
     end

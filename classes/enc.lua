@@ -90,6 +90,7 @@ Enchanter.SpellLines = {
         Options={Gem=3, precast=function() if not mq.TLO.Target.Tashed() and Enchanter:isEnabled('TASHTHENMEZ') and Enchanter.spells.tash then
             Enchanter.spells.tash:use()
             mq.delay(50)
+            mq.delay(500, function() return not mq.TLO.Me.Casting() end)
             mq.delay(2000, function() return not mq.TLO.Me.Casting() and not mq.TLO.Me.SpellInCooldown() end)
         end
         return true end}

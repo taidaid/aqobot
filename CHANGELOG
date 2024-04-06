@@ -1,3 +1,8 @@
+# 2024/04/06
+- Attempt some mezzing fixes
+- Check switch with MA false in manual assist mode
+- Pull in latest lootnscoot
+
 # 2024/02/25
 - Added /aqo save command
 - Fix mage pettype command

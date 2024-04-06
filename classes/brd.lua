@@ -119,7 +119,7 @@ Bard.SpellLines = {
     },
     {-- single target mez. Slot 8
         Group='mezst',
-        Spells={'Slumber of Suja', 'Slumber of the Diabo', 'Slumber of Zburator', 'Slumber of Jembel', 'Slumber of Silisia', --[[emu cutoff]] 'Lullaby of Morell', 'Sionachie\'s Dreams', 'Crission\'s Pixie Strike', 'Kelin\'s Lucid Lullaby'},
+        Spells={'Slumber of Suja', 'Slumber of the Diabo', 'Slumber of Zburator', 'Slumber of Jembel', 'Slumber of Silisia', --[[emu cutoff]] 'Vulka\'s Lullaby', 'Creeping Dreams', 'Lullaby of Morell', 'Sionachie\'s Dreams', 'Crission\'s Pixie Strike', 'Kelin\'s Lucid Lullaby'},
         Options={opt='MEZST', Gem=8}
     },
     {-- aoe mez. Slot 9
@@ -148,7 +148,7 @@ Bard.SpellLines = {
         Options={Gem=13}
     },
 
-    {Group='aura', Spells={'Aura of Tenisbre', 'Aura of Pli Xin Liako', 'Aura of Margidor', 'Aura of Begalru', 'Aura of Maetanrus', --[[emu cutoff]] 'Aura of the Muse', 'Aura of Insight'}, Options={aurabuff=true}}, -- spell dmg, overhaste, flurry, triple atk
+    {Group='aura', Spells={'Aura of Tenisbre', 'Aura of Pli Xin Liako', 'Aura of Margidor', 'Aura of Begalru', 'Aura of Maetanrus', --[[emu cutoff]] 'Aura of the Muse', 'Aura of Insight'}, Options={aurabuff=true, Gem=function(lvl) return state.emu and 12 or nil end}}, -- spell dmg, overhaste, flurry, triple atk
     {Group='insultpushback', Spells={'Eoreg\'s Insult', 'Sogran\'s Insult', 'Omorden\'s Insult', 'Travenro\'s Insult', 'Fjilnauk\'s Insult', --[[emu cutoff]] }, Options={opt='USEINSULTS'}}, -- synergy DD 2
     {Group='chantpoison', Spells={'Marsin\'s Chant of Poison', 'Cruor\'s Chant of Poison', 'Malvus\'s Chant of Poison', 'Nexona\'s Chant of Poison', 'Serisaria\'s Chant of Poison', --[[emu cutoff]] 'Vulka\'s Chant of Poison', 'Tuyen\'s Chant of Venom', 'Tuyen\'s Chant of Poison'}, Options={opt='USEPOISONDOTS', CheckFor=state.emu and 'Chant of Venom'}},
     {Group='alliance', Spells={'Conjunction of Sticks and Stones', 'Coalition of Sticks and Stones', 'Covenant of Sticks and Stones', 'Alliance of Sticks and Stones'}},
@@ -162,15 +162,15 @@ Bard.SpellLines = {
     -- Voice of Suja, charm
     -- Zinnia's Melodic Binding, PB slow
     -- haste song doesn't stack with enc haste?
-    {Group='overhaste', Spells={'Ancient: Call of Power', 'Warsong of the Vah Shir', 'Battlecry of the Vah Shir'}},
-    {Group='bardhaste', Spells={'Verse of Veeshan', 'Psalm of Veeshan', 'Composition of Ervaj'}},
+    {Group='overhaste', Spells={'Ancient: Call of Power', 'Warsong of the Vah Shir', 'Battlecry of the Vah Shir'}, Options={Gem=function(lvl) return state.emu and 1 or nil end}},
+    {Group='bardhaste', Spells={'Verse of Veeshan', 'Psalm of Veeshan', 'Composition of Ervaj'}, Options={Gem=function(lvl) return state.emu and 5 or nil end}},
     {Group='emuhaste', Spells={'War March of Muram', 'War March of the Mastruq', 'McVaxius\' Rousing Rondo', 'McVaxius\' Berserker Crescendo', 'Vilia\'s Verses of Celerity', 'Anthem de Arms'}},
     {Group='snare', Spells={'Selo\'s Consonant Chain'}, Options={opt='USESNARE'}},
     {Group='debuff', Spells={'Harmony of Sound'}},
     {Group='jonthans', Spells={'Jonthan\'s Whistling Warsong'}, Options={}},
     {Group='magicweapons', Spells={'Magical Monologue'}, Options={}},
     {Group='chantmagic', Spells={'Fufil\'s Curtailing Chant'}, Options={}},
-    {Group='selos', Spells={'Selo\'s Accelerating Chorus', 'Selo\'s Rhythm of Speed', 'Selo\'s Accelerando'}, Gem={function(lvl) return lvl <= 70 and 1 or nil end}},
+    {Group='selos', Spells={'Selo\'s Accelerating Chorus', 'Selo\'s Rhythm of Speed', 'Selo\'s Accelerando'}, Options={Gem=function(lvl) return lvl <= 70 and 10 or nil end}},
 
     {Group='aedot', Spells={'Denon\'s Disruptive Discord', 'Chords of Dissonance'}, Options={'USEAOE'}},
     {Group='aeslow', Spells={'Largo\'s Melodic Binding'}, Options={}},

@@ -79,8 +79,9 @@ function camp.mobRadar()
                     state.targets[mob_id] = nil
                 elseif not state.targets[mob_id] then
                     logger.debug(logger.flags.routines.camp, 'Adding mob_id %d', mob_id)
-                    state.targets[mob_id] = {meztimer=timer:new(30000)}
-                    state.targets[mob_id].meztimer:reset(0)
+                    state.targets[mob_id] = {Name=mob.CleanName()}
+                    -- state.targets[mob_id] = {meztimer=timer:new(30000)}
+                    -- state.targets[mob_id].meztimer:reset(0)
                 end
             end
         end
