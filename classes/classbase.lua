@@ -62,9 +62,11 @@ local state     = require('state')
 ---@field debuffs                   table   #Abilities used in the debuff routine
 ---@field rezAbility?               Ability #
 ---@field epic?                     string  # name of epic
----Request handling
+---Request handling / Buff Begging
 ---@field requests                  table   #Stores pending requests received from other characters
 ---@field requestAliases            table   #Aliases which can be used for requesting buffs
+---@field availableBuffs            table   #Buffs offered through buff begging system
+---@field desiredBuffs              table   #Buffs desired through buff begging system
 ---Clicky management
 ---@field clickies                  table   #Combined list of user added clickies of all types
 ---@field castClickies              table   #User added items used in the cast routine
@@ -106,6 +108,8 @@ local base = {
     debuffs = {},
     requests = {},
     requestAliases = {},
+    desiredBuffs = {},
+    availableBuffs = {},
     clickies = {},
     castClickies = {},
     pullClickies = {},
@@ -198,6 +202,14 @@ function base:addCommonAbilities()
     table.insert(self.burnAbilities, self:addAA('Empowered Focus of Arcanum'))
     table.insert(self.combatBuffs, self:addAA('Acute Focus of Arcanum', {skipifbuff='Enlightened Focus of Arcanum', combatbuff=true}))
     table.insert(self.combatBuffs, self:addAA('Enlightened Focus of Arcanum', {skipifbuff='Acute Focus of Arcanum', combatbuff=true}))
+    for _,buffline in ipairs(constants.bufflines) do
+        if self.desiredBuffs[buffline.key] == nil then
+            self.desiredBuffs[buffline.key] = constants.buffs[mq.TLO.Me.Class.ShortName()][buffline.key]
+        end
+        if self.requestAliases[buffline.key] and self:isAbilityEnabled(self.requestAliases[buffline.key].opt) and self.availableBuffs[buffline.key] == nil then
+            self.availableBuffs[buffline.key] = true
+        end
+    end
 end
 
 -- Return true only if the option is both defined and true
@@ -455,7 +467,7 @@ end
 function base:getRequestAliases()
     local aliases = {}
     for name,ability in pairs(self.requestAliases) do
-        if self:isAbilityEnabled(ability.opt) then
+        if self.availableBuffs[name] then
             aliases[name] = ability.CastName
         end
     end
@@ -485,6 +497,8 @@ function base:loadSettings()
         end
     end
     self.petWeapons = settings.petWeapons or nil
+    self.availableBuffs = settings.availableBuffs
+    self.desiredBuffs = settings.desiredBuffs
     if settings.BYOSCustom then
         self.customRotationTemp = {}
         for i,spellGroup in ipairs(settings.BYOSCustom) do
@@ -500,7 +514,17 @@ function base:saveSettings()
     for name,options in pairs(self.options) do optValues[name] = options.value end
     local byos = {}
     if self.customRotation then for i,spell in ipairs(self.customRotation) do byos[i] = spell.SpellGroup end end
-    mq.pickle(config.SETTINGS_FILE, {common=config.getAll(), [self.class]=optValues, clickies=self.clickies, petWeapons=self.petWeapons, BYOSCustom=byos, customAbilities=self.customAbilities, customOptions=self.customOptions})
+    mq.pickle(config.SETTINGS_FILE, {
+        common=config.getAll(),
+        [self.class]=optValues,
+        clickies=self.clickies,
+        petWeapons=self.petWeapons,
+        BYOSCustom=byos,
+        desiredBuffs=self.desiredBuffs,
+        availableBuffs=self.availableBuffs,
+        customAbilities=self.customAbilities,
+        customOptions=self.customOptions
+    })
 end
 
 function base:initBYOSCustom()
@@ -781,12 +805,7 @@ function base:buff()
     if buffing.buff(self) then state.actionTaken = true end
 end
 
-base.Wanted = {
-    HASTE = function(allBuffs) return true end,
-}
-
 function base:wantBuffs()
-    local wanted = constants.buffs[mq.TLO.Me.Class.ShortName()]
     local request = {}
     local allBuffs = {}
     for _,charState in pairs(state.actors) do
@@ -797,27 +816,14 @@ function base:wantBuffs()
             end
         end
     end
-    for buffAlias,wantBuff in pairs(wanted) do
-        if wantBuff == true or (type(wantBuff) == 'function' and wantBuff(allBuffs)) then
-            if (not mq.TLO.Me.Buff(allBuffs[buffAlias])() or (mq.TLO.Me.Buff(allBuffs[buffAlias]).Duration() or 0) < 60000)
-                    and (mq.TLO.Spell(allBuffs[buffAlias]).WillLand() or 0) > 0 then
-                table.insert(request, buffAlias)
+    for desiredBuff,enabled in pairs(self.desiredBuffs) do
+        if enabled then
+            if (not mq.TLO.Me.Buff(allBuffs[desiredBuff])() or (mq.TLO.Me.Buff(allBuffs[desiredBuff]).Duration() or 0) < 60000)
+                    and (mq.TLO.Spell(allBuffs[desiredBuff]).WillLand() or 0) > 0 then
+                table.insert(request, desiredBuff)
             end
         end
     end
-    -- for _,buff in ipairs(wanted) do
-    --     for _, charState in pairs(state.actors) do
-    --         local availableBuffs = charState.availableBuffs
-    --         if availableBuffs then
-    --             if availableBuffs[buff] then
-    --                 if (not mq.TLO.Me.Buff(availableBuffs[buff])() or (mq.TLO.Me.Buff(availableBuffs[buff]).Duration() or 0) < 60000)
-    --                         and (mq.TLO.Spell(availableBuffs[buff]).WillLand() or 0) > 0 then
-    --                     table.insert(request, buff)
-    --                 end
-    --             end
-    --         end
-    --     end
-    -- end
     return request
 end
 

@@ -21,6 +21,7 @@ local spellRotationUIOpen, shouldDrawSpellRotationUI = false, false
 local abilityGUIOpen, shouldDrawAbilityGUI = false, false
 local clickyManagerOpen, shouldDrawClickyManager = false, false
 local helpGUIOpen, shouldDrawHelpGUI= false, false
+local buffGUIOpen, showBuffGUI = false, false
 
 -- UI constants
 local MINIMUM_WIDTH = 430
@@ -138,6 +139,10 @@ local function drawSkillsTab()
         if ImGui.Button('Spell Rotation', x, BUTTON_HEIGHT) then
             spellRotationUIOpen = true
         end
+    end
+    ImGui.SameLine()
+    if ImGui.Button('Buffs', x, BUTTON_HEIGHT) then
+        buffGUIOpen = true
     end
     local x, y = ImGui.GetCursorPos()
     local xOffset = x
@@ -556,6 +561,43 @@ local function drawSpellRotationUI()
     end
 end
 
+local function drawBuffLists()
+    if buffGUIOpen then
+        buffGUIOpen, showBuffGUI = ImGui.Begin(('Buffs##AQOBOTUI%s'):format(state.class), buffGUIOpen, ImGuiWindowFlags.None)
+        if showBuffGUI then
+            if ImGui.CollapsingHeader('Want Buffs') then
+                ImGui.Indent(30)
+                for _,category in ipairs(constants.buffcategories) do
+                    if ImGui.CollapsingHeader(category) then
+                        for _,buff in ipairs(constants.bufflines) do
+                            if buff.category == category then
+                                class.desiredBuffs[buff.key] = ImGui.Checkbox(buff.label..' ['..buff.key..']'..'##desired', class.desiredBuffs[buff.key] or false)
+                            end
+                        end
+                    end
+                end
+                ImGui.Unindent(30)
+            end
+            if ImGui.CollapsingHeader('Offer Buffs') then
+                ImGui.Indent(30)
+                for _,category in ipairs(constants.buffcategories) do
+                    if ImGui.CollapsingHeader(category) then
+                        for _,buff in ipairs(constants.bufflines) do
+                            if buff.category == category then
+                                if class.requestAliases[buff.key] then
+                                    class.availableBuffs[buff.key] = ImGui.Checkbox(buff.label..' ['..buff.key..']'..'##available', class.availableBuffs[buff.key] or false)
+                                end
+                            end
+                        end
+                    end
+                end
+                ImGui.Unindent(30)
+            end
+        end
+        ImGui.End()
+    end
+end
+
 local function drawSpellSetTree(name, spells)
     if ImGui.TreeNode(name..'##spellset') then
         for _,spell in ipairs(spells) do
@@ -816,6 +858,7 @@ function ui.main()
     drawStateInspector()
     drawClickyManager()
     drawHelpWindow()
+    drawBuffLists()
     popStyles()
 end
 

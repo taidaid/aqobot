@@ -227,6 +227,36 @@ function commands.commandHandler(...)
             clickies = clickies .. '\n- ' .. clickyName .. ' (' .. clicky.clickyType .. ') Enabled='..tostring(clicky.enabled)
         end
         logger.info('Clickies: %s', clickies)
+    elseif opt == 'BUFFALIASES' then
+        local aliases = 'Buff Aliases:\n'
+        for _,buffline in ipairs(constants.bufflines) do
+            aliases = aliases .. '- \ay' .. buffline.key .. '\ax\n'
+        end
+        logger.info(aliases)
+    elseif opt == 'WANTBUFF' then
+        local buffalias = args[2] and args[2]:upper() or nil
+        local toggle = args[3] and args[3]:lower() or nil
+        for _,buffline in ipairs(constants.bufflines) do
+            if buffline.key == buffalias then
+                if not toggle or constants.booleans[toggle] == nil then
+                    logger.info('Want Buff: \ag%s\ax [\ay%s\ax]', buffalias, class.desiredBuffs[buffalias])
+                else
+                    class.desiredBuffs[buffalias] = constants.booleans[toggle]
+                end
+            end
+        end
+    elseif opt == 'OFFERBUFF' then
+        local buffalias = args[2] and args[2]:upper() or nil
+        local toggle = args[3] and args[3]:lower() or nil
+        for _,buffline in ipairs(constants.bufflines) do
+            if buffline.key == buffalias then
+                if not toggle or constants.booleans[toggle] == nil then
+                    logger.info('Offer Buff: \ag%s\ax [\ay%s\ax]', buffalias, class.availableBuffs[buffalias])
+                else
+                    class.availableBuffs[buffalias] = constants.booleans[toggle]
+                end
+            end
+        end
     elseif opt == 'INVIS' then
         if class.invis then
             class:invis()
