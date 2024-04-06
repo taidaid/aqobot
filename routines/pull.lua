@@ -73,6 +73,15 @@ local function checkMobLevel(pull_spawn)
     return mob_level >= config.get('PULLMINLEVEL') and mob_level <= config.get('PULLMAXLEVEL')
 end
 
+local function checkPathLength(pull_spawn)
+    local path_len = mq.TLO.Navigation.PathLength(string.format('id %s', pull_spawn.ID()))()
+    if path_len < 0 or path_len > config.get('PULLRADIUS') then
+        logger.debug(logger.flags.routines.pull, 'Navigation PathLength %s exceeds PullRadius %s', path_len, config.get('PULLRADIUS'))
+        return -1
+    end
+    return path_len
+end
+
 ---Validate that the spawn is good for pulling
 ---@param pull_spawn MQSpawn @The MQ Spawn to validate.
 ---@param path_len number @The navigation path length to the spawn.
@@ -82,10 +91,6 @@ local function validatePull(pull_spawn, path_len, zone_sn)
     local mob_id = pull_spawn.ID()
     if not mob_id or mob_id == 0 or PULL_TARGET_SKIP[mob_id] or pull_spawn.Type() == 'Corpse' or pull_spawn.Surname() ~= '' then
         logger.debug(logger.flags.routines.pull, 'Invalid mob ID %s (type=%s, skip=%s)', mob_id, pull_spawn.Type(), PULL_TARGET_SKIP[mob_id])
-        return false
-    end
-    if path_len < 0 or path_len > config.get('PULLRADIUS') then
-        logger.debug(logger.flags.routines.pull, 'Navigation PathLength %s exceeds PullRadius %s', path_len, config.get('PULLRADIUS'))
         return false
     end
     return checkMobAngle(pull_spawn) and checkZRadius(pull_spawn) and checkMobLevel(pull_spawn) and not config.ignoresContains(zone_sn, pull_spawn.CleanName())
@@ -223,21 +228,25 @@ function pull.pullRadar()
             else
                 mob = mq.TLO.NearestSpawn(pull_spawn:format(i, pull_radius))
             end
-            local path_len = mq.TLO.Navigation.PathLength(string.format('id %s', mob.ID()))()
-            if validatePull(mob, path_len, zone_sn) then
-                -- TODO: check for people nearby, check level, check z radius if high/low differ
-                --local pc_near_count = mq.TLO.SpawnCount(pc_near:format(mob.X(), mob.Y()))
-                --if pc_near_count == 0 then
-                local dist3d = mob.Distance3D()
-                if mob.LineOfSight() or (dist3d and path_len < dist3d+50) then
-                    -- don't bother to check path length if mob already in los.
-                    -- if path length is within 50 of distance3d then its probably safe to pull also
-                    state.pullMobID = mob.ID()
-                    return mob.ID()
-                elseif path_len < shortest_path then
-                    logger.debug(logger.flags.routines.pull, ("Found closer pull, %s < %s"):format(path_len, shortest_path))
-                    shortest_path = path_len
-                    pull_id = mob.ID()
+            if validatePull(mob, 0, zone_sn) then
+                local path_len = checkPathLength(mob)
+                if path_len > -1 then
+                -- local path_len = mq.TLO.Navigation.PathLength(string.format('id %s', mob.ID()))()
+                -- if  then
+                    -- TODO: check for people nearby, check level, check z radius if high/low differ
+                    --local pc_near_count = mq.TLO.SpawnCount(pc_near:format(mob.X(), mob.Y()))
+                    --if pc_near_count == 0 then
+                    local dist3d = mob.Distance3D()
+                    if mob.LineOfSight() or (dist3d and path_len < dist3d+50) then
+                        -- don't bother to check path length if mob already in los.
+                        -- if path length is within 50 of distance3d then its probably safe to pull also
+                        state.pullMobID = mob.ID()
+                        return mob.ID()
+                    elseif path_len < shortest_path then
+                        logger.debug(logger.flags.routines.pull, ("Found closer pull, %s < %s"):format(path_len, shortest_path))
+                        shortest_path = path_len
+                        pull_id = mob.ID()
+                    end
                 end
             end
         end

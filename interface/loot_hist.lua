@@ -77,6 +77,7 @@ local guiLoot = {
 	hideNames = false,
 	showLinks = false,
 	linkdb = false,
+
 	importGUIElements = {},
 
 	---@type ConsoleWidget
@@ -88,6 +89,7 @@ local guiLoot = {
 	winFlags = bit32.bor(ImGuiWindowFlags.MenuBar)
 }
 local lootTable = {}
+
 ---@param names boolean
 ---@param links boolean
 ---@param record boolean
@@ -98,6 +100,7 @@ function guiLoot.GetSettings(names,links,record)
 		guiLoot.recordData = record
 	end
 end
+
 function guiLoot.loadLDB()
 	if guiLoot.linkdb then return end
 	local sWarn = "MQ2LinkDB not loaded, Can't lookup links.\n Attempting to Load MQ2LinkDB"
@@ -106,7 +109,6 @@ function guiLoot.loadLDB()
 	mq.cmdf("/plugin mq2linkdb noauto")
 	guiLoot.linkdb = mq.TLO.Plugin('mq2linkdb').IsLoaded()
 end
-
 -- draw any imported exported menus from outside this script.
 function drawImportedMenu()
 	for _, menuElement in ipairs(guiLoot.importGUIElements) do
@@ -134,7 +136,9 @@ end
 
 function guiLoot.GUI()
 	if not guiLoot.openGUI then return end
+
 	local windowName = 'Looted Items##'..mq.TLO.Me.DisplayName()
+
 	ImGui.SetNextWindowSize(260, 300, ImGuiCond.FirstUseEver)
 	--imgui.PushStyleVar(ImGuiStyleVar.WindowPadding, ImVec2(1, 0));
 
@@ -146,6 +150,7 @@ function guiLoot.GUI()
 		guiLoot.shouldDrawGUI = false
 		return
 	end
+
 	-- Main menu bar
 	if imgui.BeginMenuBar() then
 		if imgui.BeginMenu('Options') then
@@ -223,16 +228,16 @@ function guiLoot.GUI()
 		end
 		if imgui.BeginMenu('Hide Corpse') then
 			if imgui.MenuItem('alwaysnpc') then
-				mq.cmd('/hidecorpse alwaysnpc')
+					mq.cmd('/hidecorpse alwaysnpc')
 			end
 			if imgui.MenuItem('looted') then
-				mq.cmd('/hidecorpse looted')
+					mq.cmd('/hidecorpse looted')
 			end
 			if imgui.MenuItem('all') then
-				mq.cmd('/hidecorpse all')
+					mq.cmd('/hidecorpse all')
 			end
 			if imgui.MenuItem('none') then
-				mq.cmd('/hidecorpse none')
+					mq.cmd('/hidecorpse none')
 			end
 			imgui.EndMenu()
 		end
@@ -282,10 +287,10 @@ function guiLoot.RegisterActor()
 				if who ~= mq.TLO.Me() then who = mq.TLO.Spawn(string.format("%s", who)).Class.ShortName() else who = mq.TLO.Me.Class.ShortName() end
 			end
 
-			local text = string.format('\ao[%s] \at%s \ax%s %s (%s)', lootEntry.LootedAt, who, item.Action, link, lootEntry.ID)
+			local text = string.format('\ao[%s] \at%s \ax%s %s', lootEntry.LootedAt, who, item.Action, link)
 			guiLoot.console:AppendText(text)
 			-- do we want to record loot data?
-			if guiLoot.recordData and item.Action == 'Looted' then
+			if guiLoot.recordData then
 				addRule(who, what, link)
 			end
 		end

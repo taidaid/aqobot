@@ -127,7 +127,7 @@ function Ability:new(spellData, type)
     -- Prefer the type which was passed in over detecting the type
     if not ability.CastType then ability:setSpellType() end
     ability:setSpellData()
-    ability.timer = timer:new(1000) -- prevent spam, ready checks should be fine once the ability is actually on cd
+    ability.timer = ability.timer or timer:new(1000) -- prevent spam, ready checks should be fine once the ability is actually on cd
     ability.timer:reset(0)
     return ability
 end
@@ -669,7 +669,7 @@ function Ability:setSpellData()
         if itemRef.Clicky.RecastType() then
             self.RecastTime = itemRef.Clicky.TimerID()*1000
         end
-        -- self.timer = timer:new(self.RecastTime)
+        self.timer = timer:new(self.RecastTime)
 
         self.SpellName = itemSpellRef.Name()
         self.CastID = itemRef.ID()
