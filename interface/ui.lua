@@ -568,7 +568,7 @@ local function drawBuffLists()
             if ImGui.CollapsingHeader('Want Buffs') then
                 ImGui.Indent(30)
                 for _,category in ipairs(constants.buffcategories) do
-                    if ImGui.CollapsingHeader(category) then
+                    if ImGui.CollapsingHeader(category..'##want') then
                         for _,buff in ipairs(constants.bufflines) do
                             if buff.category == category then
                                 class.desiredBuffs[buff.key] = ImGui.Checkbox(buff.label..' ['..buff.key..']'..'##desired', class.desiredBuffs[buff.key] or false)
@@ -581,7 +581,7 @@ local function drawBuffLists()
             if ImGui.CollapsingHeader('Offer Buffs') then
                 ImGui.Indent(30)
                 for _,category in ipairs(constants.buffcategories) do
-                    if ImGui.CollapsingHeader(category) then
+                    if ImGui.CollapsingHeader(category..'##offer') then
                         for _,buff in ipairs(constants.bufflines) do
                             if buff.category == category then
                                 if class.requestAliases[buff.key] then
