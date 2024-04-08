@@ -5,6 +5,7 @@ local conditions = require('routines.conditions')
 local logger = require('utils.logger')
 local timer = require('libaqo.timer')
 local abilities = require('ability')
+local config = require('interface.configuration')
 local common = require('common')
 local state = require('state')
 
@@ -52,6 +53,7 @@ function Bard:initClassOptions()
     self:addOption('USEPOISONDOTS', 'Use Poison DoT', false, nil, 'Toggle use of Poison DoT songs if they are in the selected song list', 'checkbox', nil, 'UsePoisonDoTs', 'bool')
     self:addOption('USEDISEASEDOTS', 'Use Disease DoT', false, nil, 'Toggle use of Disease DoT songs if they are in the selected song list', 'checkbox', nil, 'UseDiseaseDoTs', 'bool')
     self:addOption('USEREGENSONG', 'Use Regen Song', false, nil, 'Toggle use of hp/mana regen song line', 'checkbox', nil, 'UseRegenSong', 'bool')
+    self:addOption('USESELOSAA', 'Use Selos AA', false, nil, 'Toggle use of Selos AA', 'checkbox', nil, 'UseSelosAA', 'bool')
 end
 
 -- melee haste v98 (Bard Haste) (Composition of Ervaj (lvl 60), Melody of Ervaj (lvl 50))
@@ -180,7 +182,8 @@ Bard.SpellLines = {
 
 Bard.compositeNames = {['Ecliptic Psalm']=true,['Composite Psalm']=true,['Dissident Psalm']=true,['Dichotomic Psalm']=true}
 Bard.allDPSSpellGroups = {'aria', 'arcane', 'chantfrost', 'spiteful', 'firenukebuff', 'chantflame', 'suffering', 'insult', 'warmarch', 'sonata', 'firemagicdotbuff', 'chantdisease',
-    'crescendo', 'pulse', 'composite', 'dirge', 'insultpushback', 'chantpoison', 'alliance', 'overhaste', 'bardhaste', 'emuhaste', 'snare', 'debuff'}
+    'crescendo', 'pulse', 'composite', 'dirge', 'insultpushback', 'chantpoison', 'alliance', 'overhaste', 'bardhaste', 'emuhaste', 'snare', 'debuff', 'jonthans', 'magicweapons',
+    'chantmagic', 'aedot', 'aeslow', 'manasong', 'dispel'}
 
 Bard.Abilities = {
     {
@@ -503,7 +506,7 @@ local function isDotReady(spellId, spellName)
     local actualSpellName = spellName
     if state.subscription ~= 'GOLD' then actualSpellName = spellName:gsub(' Rk%..*', '') end
     local songDuration = 0
-    if not mq.TLO.Me.Gem(spellName)() or mq.TLO.Me.GemTimer(spellName)() ~= 0  then
+    if not mq.TLO.Me.Gem(spellName)() or mq.TLO.Me.GemTimer(spellName)() ~= 0 then
         return false
     end
     if not mq.TLO.Target() or mq.TLO.Target.ID() ~= state.assistMobID or mq.TLO.Target.Type() == 'Corpse' then return false end
@@ -519,7 +522,6 @@ local function isDotReady(spellId, spellName)
             return true
         end
     end
-
     return false
 end
 
@@ -558,23 +560,39 @@ local function isSongReady(spellId, spellName)
     end
 end
 
-local function findNextSong()
+function Bard:findNextSong()
     if tryAlliance() then return nil end
     if castSynergy() then return nil end
     if not mq.TLO.Target.Snared() and Bard:isEnabled('USESNARE') and ((mq.TLO.Target.PctHPs() or 100) < 30) then
         return Bard.spells.snare
     end
-    if not Bard.spellRotations[Bard:get('SPELLSET')] then return nil end
-    for _,song in ipairs(Bard.spellRotations[Bard:get('SPELLSET')]) do -- iterates over the dots array. ipairs(dots) returns 2 values, an index and its value in the array. we don't care about the index, we just want the dot
-        local song_id = song.ID
-        local song_name = song.Name
-        if Bard:isAbilityEnabled(song.opt) and isSongReady(song_id, song_name) and not mq.TLO.Target.Buff(song.CheckFor)() then
-            if song_name ~= (Bard.spells.composite and Bard.spells.composite.Name) or mq.TLO.Target() then
-                return song
-            end
+
+    local spellRotation = self:getSpellRotation()
+    if not spellRotation then return nil end
+    local startIndex = state.rotationIndex and state.rotationIndex < #spellRotation and state.rotationIndex + 1 or 1
+    for i=startIndex,#spellRotation do
+        local spell = spellRotation[i]
+        local resistCount = state.resists[spell.Name] or 0
+        local resistStopCount = config.get('RESISTSTOPCOUNT')
+        if self:isAbilityEnabled(spell.opt) and isSongReady(spell.ID, spell.CastName) and not mq.TLO.Target.Buff(spell.CheckFor)()
+                and (resistStopCount == 0 or resistCount < resistStopCount)
+                and (not spell.condition or spell.condition()) then
+            return spell, i
         end
     end
-    return nil -- we found no missing dot that was ready to cast, so return nothing
+    -- didn't find a next spell to cast, reset rotation
+    state.rotationIndex = nil
+    -- if not Bard.spellRotations[Bard:get('SPELLSET')] then return nil end
+    -- for _,song in ipairs(Bard.spellRotations[Bard:get('SPELLSET')]) do -- iterates over the dots array. ipairs(dots) returns 2 values, an index and its value in the array. we don't care about the index, we just want the dot
+    --     local song_id = song.ID
+    --     local song_name = song.Name
+    --     if Bard:isAbilityEnabled(song.opt) and isSongReady(song_id, song_name) and not mq.TLO.Target.Buff(song.CheckFor)() then
+    --         if song_name ~= (Bard.spells.composite and Bard.spells.composite.Name) or mq.TLO.Target() then
+    --             return song
+    --         end
+    --     end
+    -- end
+    -- return nil -- we found no missing dot that was ready to cast, so return nothing
 end
 
 function Bard:cast()
@@ -606,7 +624,7 @@ function Bard:cast()
                 end
             end
         end
-        local spell = findNextSong() -- find the first available dot to cast that is missing from the target
+        local spell = self:findNextSong() -- find the first available dot to cast that is missing from the target
         if spell then -- if a song was found
             local didCast = false
             if spell.TargetType == 'Single' and mq.TLO.Target.Type() == 'NPC' then
@@ -687,7 +705,7 @@ function Bard:doneSinging()
         mq.delay(1)
     end
     if not mq.TLO.Me.Casting() then
-        if not self.spells.selos and self.selos and selosTimer:expired() then
+        if self:isEnabled('USESELOSAA') and self.selos and selosTimer:expired() then
             self.selos:use()
             selosTimer:reset()
         end
