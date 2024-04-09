@@ -469,6 +469,15 @@ local config = {
         tlotype = 'int',
     },
 
+    DELAYFORLAG = {
+        value = 0,
+        tip = 'Adjustable amount of time to delay to account for extra lag like EU playing on US servers',
+        label = 'Delay For Lag',
+        type = 'inputint',
+        tlo = 'DelayForLag',
+        tlotype = 'int',
+    },
+
     TIMESTAMPS = {
         value = false,
         tip = 'Enable timestamps on log messages',

@@ -260,8 +260,8 @@ local function drawDebugTab()
     ImGui.SameLine()
     if ImGui.Button('View Loot', buttonWidth, BUTTON_HEIGHT) then
         guiLoot.openGUI = not guiLoot.openGUI
-        lootGUIOpen = true
     end
+    config.DELAYFORLAG.value = widgets.SliderInt('Delay for Lag', config.DELAYFORLAG.value, 'Set the amount of delay to account for lag in various places', 0, 1000, item_width)
     ImGui.TextColored(YELLOW, 'Mode:')
     ImGui.SameLine()
     ImGui.SetCursorPosX(150)

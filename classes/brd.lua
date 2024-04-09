@@ -700,7 +700,7 @@ end
 function Bard:doneSinging()
     if self:isEnabled('USETWIST') then return true end
     if mq.TLO.Me.CastTimeLeft() > 0 and not mq.TLO.Window('CastingWindow').Open() then
-        mq.delay(250)
+        mq.delay(250+config.get('DELAYFORLAG'))
         mq.cmd('/stopsong')
         mq.delay(1)
     end
