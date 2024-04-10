@@ -135,7 +135,7 @@ end
 local lootMyCorpseTimer = timer:new(5000)
 local function doLooting()
     local myCorpse = mq.TLO.Spawn('pccorpse '..mq.TLO.Me.CleanName()..'\'s corpse radius 100')
-    if myCorpse() and lootMyCorpseTimer:expired() then
+    if not mq.TLO.Me.Combat() and mq.TLO.Me.CombatState() ~= 'COMBAT' and myCorpse() and lootMyCorpseTimer:expired() then
         lootMyCorpseTimer:reset()
         myCorpse.DoTarget()
         if mq.TLO.Target.Type() == 'Corpse' then
