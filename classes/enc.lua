@@ -192,9 +192,10 @@ Enchanter.SpellLines = {
     {Group='pethaste', Spells={'Invigorated Minion'}, Options={petbuff=true}},
     -- buffs
     -- {Group='unified', Spells={'Unified Alacrity'}, Options={emu=true, alias='KEI', selfbuff=true}},
-    {Group='keigroup', Spells={'Voice of Preordination', 'Voice of Perception', 'Voice of Sagacity', 'Voice of Perspicacity', 'Voice of Precognition', 'Voice of Foresight', 'Voice of Premeditation', 'Voice of Forethought', 'Unified Alacrity', 'Voice of Clairvoyance', 'Voice of Quellious'}, Options={alias='KEI', selfbuff=true}},
+    {Group='resmagicgroup', Spells={'Group Resist Magic'}, Options={alias='RESMAGIC', selfbuff=true}},
+    {Group='keigroup', Spells={'Voice of Preordination', 'Voice of Perception', 'Voice of Sagacity', 'Voice of Perspicacity', 'Voice of Precognition', 'Voice of Foresight', 'Voice of Premeditation', 'Voice of Forethought', 'Unified Alacrity', 'Voice of Clairvoyance', 'Voice of Quellious', 'Koadic\'s Endless Intellect'}, Options={alias='KEI', selfbuff=true}},
     {Group='kei', Spells={'Preordination', 'Scrying Visions', 'Sagacity', 'Foresight', 'Premiditation', 'Forethought', 'Clairovoyance', 'Clarity', 'Breeze'}, Options={alias='SINGLEKEI', selfbuff=function() return not Enchanter.spells.keigroup and true or false end}},
-    {Group='grouphaste', Spells={'Hastening of Margator', 'Hastening of Jharin', 'Hastening of Cekenar', 'Hastening of Milyex', 'Hastening of Prokev', 'Hastening of Sviir', 'Hastening of Aransir', 'Hastening of Novak', 'Unified Alacrity', 'Hastening of Salik', 'Vallon\'s Quickening'}, Options={alias='HASTE'}}, -- group haste
+    {Group='grouphaste', Spells={'Hastening of Margator', 'Hastening of Jharin', 'Hastening of Cekenar', 'Hastening of Milyex', 'Hastening of Prokev', 'Hastening of Sviir', 'Hastening of Aransir', 'Hastening of Novak', 'Unified Alacrity', 'Hastening of Salik', 'Vallon\'s Quickening', 'Speed of the Brood'}, Options={alias='HASTE'}}, -- group haste
     {Group='haste', Spells={'Speed of Margator', 'Speed of Itzal', 'Speed of Cekenar', 'Speed of Milyex', 'Speed of Prokev', 'Speed of Sviir', 'Speed of Aransir', 'Speed of Novak', 'Visions of Grandeur', 'Augmentation', 'Alacrity', 'Quickness'}, Options={alias='SINGLEHASTE'}}, -- single target buff
     -- auras - mana, learners, spellfocus, combatinnate, disempower, rune, twincast
     {Group='twincast', Spells={'Twincast Aura'}, Options={aurabuff=true, condition=function() return Enchanter:get('AURA1') == Enchanter.spells.twincast.Name or Enchanter:get('AURA2') == Enchanter.spells.twincast.Name end}},
