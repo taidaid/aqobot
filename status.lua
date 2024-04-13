@@ -46,7 +46,7 @@ local statusTimer = Timer:new(1000)
 function status.send(class)
     if not statusTimer:expired() then return end
     statusTimer:reset()
-    local header = {script = 'aqo'}
+    local header = {script = 'aqo', server = mq.TLO.EverQuest.Server()}
     -- Send info on any debuffs
     local buffs = {}
     for i=1,42 do
