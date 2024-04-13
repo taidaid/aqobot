@@ -67,7 +67,7 @@ local function buffAuras(base)
         if not mq.TLO.Me.Aura(buff.CheckFor)() and not mq.TLO.Me.Song(buffName)() then
             if abilities.use(buff, base, true) then
                 -- some goofy emu servers have longer cast times than standard songs on bard auras.. hacky little workaround?
-                if state.class == 'brd' and (buff.MyCastTime or 0) > 3000 then mq.delay(500+buff.MyCastTime, function() return not mq.TLO.Me.Casting() end) end
+                if state.class == 'BRD' and (buff.MyCastTime or 0) > 3000 then mq.delay(500+buff.MyCastTime, function() return not mq.TLO.Me.Casting() end) end
                 return true
             end
         end
