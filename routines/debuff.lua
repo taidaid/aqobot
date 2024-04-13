@@ -37,33 +37,19 @@ function debuff.findNextDebuff(opt)
     end
 end
 
+local debuffTypeMap = {Dispel='USEDISPEL',DebuffAOE='USEDEBUFFAOE',Debuff='USEDEBUFF',SlowAOE='USESLOWAOE',Slow='USESLOW',Snare='USESNARE'}
 function debuff.castDebuffs()
-    if mq.TLO.Target.Type() ~= 'NPC' or not mq.TLO.Target.Aggressive() then return end
-    if class:isEnabled('USEDISPEL') then
-        if debuff.findNextDebuff('USEDISPEL') then return true end
-    end
-    if class:isEnabled('USEDEBUFFAOE') then
-        if debuff.findNextDebuff('USEDEBUFFAOE') then return true end
-    end
-    if class:isEnabled('USEDEBUFF') then
-        if debuff.findNextDebuff('USEDEBUFF') then return true end
-    end
-    if class:isEnabled('USESLOWAOE') then
-        if debuff.findNextDebuff('USESLOWAOE') then
-            mq.doevents('event_debuffSlowImmune')
-            return true
-        end
-    end
-    if class:isEnabled('USESLOW') then
-        if debuff.findNextDebuff('USESLOW') then
-            mq.doevents('event_debuffSlowImmune')
-            return true
-        end
-    end
-    if class:isEnabled('USESNARE') then
-        if debuff.findNextDebuff('USESNARE') then
-            mq.doevents('event_debuffSnareImmune')
-            return true
+    -- if mq.TLO.Target.Type() ~= 'NPC' or not mq.TLO.Target.Aggressive() then return end
+    for _,debuffType in ipairs(class.debuffOrder) do
+        if class:isEnabled(debuffTypeMap[debuffType]) then
+            if debuff.findNextDebuff(debuffTypeMap[debuffType]) then
+                if debuffType == 'SlowAOE' or debuffType == 'Slow' then
+                    mq.doevents('event_debuffSlowImmune')
+                elseif debuffType == 'Snare' then
+                    mq.doevents('event_debuffSnareImmune')
+                end
+                return true
+            end
         end
     end
 end

@@ -617,6 +617,33 @@ local function drawAbilityInspector()
                 end
                 ImGui.TreePop()
             end
+            if #class.debuffs > 0 and ImGui.TreeNode('Debuff Order') then
+                if ImGui.BeginListBox('##debufforder', ImVec2(160,150)) then
+                    for i,debuffType in ipairs(class.debuffOrder) do
+                        if ImGui.Selectable(('%s: %s'):format(i, debuffType), selected_left == i) then
+                            selected_left = i
+                        end
+                        if ImGui.IsMouseDown(0) and ImGui.IsItemHovered() then
+                            if ImGui.BeginDragDropSource() then
+                                ImGui.SetDragDropPayload("DebuffType", i)
+                                ImGui.Button(debuffType)
+                                ImGui.EndDragDropSource()
+                            end
+                        end
+                        if ImGui.BeginDragDropTarget() then
+                            local payload = ImGui.AcceptDragDropPayload("DebuffType")
+                            if payload ~= nil then
+                                local j = payload.Data;
+                                -- swap the keys in the button set
+                                class.debuffOrder[i], class.debuffOrder[j] = class.debuffOrder[j], class.debuffOrder[i]
+                            end
+                            ImGui.EndDragDropTarget()
+                        end
+                    end
+                    ImGui.EndListBox()
+                end
+                ImGui.TreePop()
+            end
             if mq.TLO.Me.Class.CanCast() then
                 if ImGui.TreeNode('Spells') then
                     for alias,spell in pairs(class.spells) do

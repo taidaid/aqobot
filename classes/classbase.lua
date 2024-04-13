@@ -60,6 +60,7 @@ local state     = require('state')
 ---@field petBuffs                  table   #Abilities used for pet buffing
 ---@field cures                     table   #Abilities used in the cure routine
 ---@field debuffs                   table   #Abilities used in the debuff routine
+---@field debuffOrder               table   #Priority ordered list of debuff types
 ---@field rezAbility?               Ability #
 ---@field epic?                     string  # name of epic
 ---Request handling / Buff Begging
@@ -113,6 +114,7 @@ local base = {
     clickies = {},
     castClickies = {},
     pullClickies = {},
+    debuffOrder = {'Dispel','DebuffAOE','Debuff','SlowAOE','Slow','Snare'}
 }
 
 function base:new(o)
@@ -505,6 +507,7 @@ function base:loadSettings()
             self.customRotationTemp[i] = spellGroup
         end
     end
+    self.debuffOrder = settings.debuffOrder
     self.customAbilities = settings.customAbilities or {}
     self.customOptions = settings.customOptions or {}
 end
@@ -523,7 +526,8 @@ function base:saveSettings()
         desiredBuffs=self.desiredBuffs,
         availableBuffs=self.availableBuffs,
         customAbilities=self.customAbilities,
-        customOptions=self.customOptions
+        customOptions=self.customOptions,
+        debuffOrder=self.debuffOrder,
     })
 end
 
