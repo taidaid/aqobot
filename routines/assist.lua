@@ -386,8 +386,8 @@ function assist.sendPet()
     if sendPetTimer:expired() and targethp and targethp <= config.get('AUTOASSISTAT') then
         if assist.isFighting() then
             if mq.TLO.Pet.ID() > 0 and mq.TLO.Pet.Target.ID() ~= mq.TLO.Target.ID() and not state.petDontAttack then
-                if class.summonCompanion and helpers.distance(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Pet.X(), mq.TLO.Pet.Y()) > 625 then
-                    class.summonCompanion:use()
+                if class.summoncompanion and helpers.distance(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Pet.X(), mq.TLO.Pet.Y()) > 625 then
+                    class.summoncompanion:use()
                 end
                 mq.cmd('/multiline ; /pet attack ; /pet swarm')
             else

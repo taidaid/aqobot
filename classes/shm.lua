@@ -101,6 +101,7 @@ function Shaman:initClassOptions()
     self:addOption('USEDISPEL', 'Use Dispel', true, nil, 'Toggle use of dispel', 'checkbox', nil, 'UseDispel', 'bool')
     self:addOption('USESLOW', 'Use Slow', true, nil, 'Toggle casting slow on mobs', 'checkbox', nil, 'UseSlow', 'bool')
     self:addOption('USESLOWAOE', 'Use Slow AOE', true, nil, 'Toggle casting AOE slow on mobs', 'checkbox', nil, 'UseSlowAOE', 'bool')
+    self:addOption('SLOWALL', 'Slow All Mobs', false, nil, 'Toggle casting slow on all mobs', 'checkbox', nil, 'SlowAll', 'bool')
     self:addOption('USENUKES', 'Use Nukes', true, nil, 'Toggle use of nukes', 'checkbox', nil, 'UseNukes', 'bool')
     self:addOption('USEDOTS', 'Use DoTs', true, nil, 'Toggle use of DoTs', 'checkbox', nil, 'UseDoTs', 'bool')
     self:addOption('USEEPIC', 'Use Epic', true, nil, 'Use epic in burns', 'checkbox', nil, 'UseEpic', 'bool')
@@ -170,7 +171,7 @@ Shaman.SpellLines = {
     {-- group heal. Slot 7
         Group='recourse',
         Spells={'Grayleaf\'s Recourse', 'Rowain\'s Recourse', 'Zrelik\'s Recourse', 'Eyrzekla\'s Recourse', 'Krasir\'s Recourse', 'Word of Reconstitution', 'Word of Restoration', 'Word of Health'},
-        Options={Gem=function() return Shaman:get('SPELLSET') == 'standard' and 7 or nil end, group=true}
+        Options={alias='GROUPHEAL', Gem=function() return Shaman:get('SPELLSET') == 'standard' and 7 or nil end, group=true}
     },
     {-- DPS spellset. Slot 7
         Group='poisonnuke',

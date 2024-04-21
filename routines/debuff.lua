@@ -27,12 +27,15 @@ function debuff.shouldUseDebuff(ability)
     end
 end
 
-function debuff.findNextDebuff(opt)
+function debuff.findNextDebuff(opt, targetID)
     for _,ability in ipairs(class.debuffs) do
         local resistCount = state.resists[ability.Name] or 0
         local resistStopCount = config.get('RESISTSTOPCOUNT')
-        if (resistStopCount == 0 or resistCount < resistStopCount) and ability.opt == opt and debuff.shouldUseDebuff(ability) then
-            if abilities.use(ability) then return true end
+        if ability:canUse() == abilities.IsReady.CAN_CAST then
+            if targetID then mq.TLO.Spawn('id '..targetID).DoTarget() mq.delay(1000, function() return mq.TLO.Target.BuffsPopulated() end) end
+            if (resistStopCount == 0 or resistCount < resistStopCount) and ability.opt == opt and debuff.shouldUseDebuff(ability) then
+                if abilities.use(ability) then return true end
+            end
         end
     end
 end
@@ -49,6 +52,22 @@ function debuff.castDebuffs()
                     mq.doevents('event_debuffSnareImmune')
                 end
                 return true
+            end
+        end
+    end
+end
+
+function debuff.debuffOthers()
+    for id,mobdata in pairs(state.targets) do
+        if id ~= state.assistMobID then
+            if not mobdata.slowed then
+                -- mq.TLO.Spawn('id '..id).DoTarget()
+                -- mq.delay(1000, function() return mq.TLO.Target.BuffsPopulated() end)
+                if debuff.findNextDebuff('USESLOW', id) then
+                    state.targets[id].slowed = true
+                    mq.doevents('event_debuffSlowImmune')
+                    return true
+                end
             end
         end
     end

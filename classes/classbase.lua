@@ -741,9 +741,15 @@ function base:findNextSpell()
 end
 
 function base:debuff()
-    if mq.TLO.Target.ID() == mq.TLO.Me.ID() then return end
+    if mq.TLO.Target.ID() == mq.TLO.Me.ID() or mq.TLO.Target.Type() ~= 'NPC' then return end
     if assist.isFighting() then
-        debuff.castDebuffs()
+        if not debuff.castDebuffs() then
+            if self:isEnabled('SLOWALL') then
+                if debuff.debuffOthers() then return true end
+            end
+        else
+            return true
+        end
     end
 end
 
