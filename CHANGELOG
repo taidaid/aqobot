@@ -1,3 +1,6 @@
+# 2024/04/21
+- Add SLOWALL option for shaman. May be buggy as it resist count tracking is based on current assist target only, so may screw up some if stuff resists
+
 # 2024/04/06
 - Attempt some mezzing fixes
 - Check switch with MA false in manual assist mode
