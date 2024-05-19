@@ -26,7 +26,7 @@ local BeastLord = class:new()
     Sympathetic Warder
 ]]
 function BeastLord:init()
-    self.classOrder = {'assist', 'aggro', 'cast', 'recover', 'mash', 'burn', 'heal', 'buff', 'rest', 'managepet', 'rez'}
+    self.classOrder = {'assist', 'aggro', 'debuff', 'cast', 'recover', 'mash', 'burn', 'heal', 'buff', 'rest', 'managepet', 'rez'}
     self.spellRotations = {standard={},custom={}}
     self:initBase('BST')
 
@@ -153,7 +153,7 @@ BeastLord.SpellLines = {
     },
     {-- DoT. Slot 7
         Group='dot1',
-        Spells={'Fevered Endemic', 'Vampyric Endemic', 'Neemzaq\'s Endemic', 'Elkikatar\'s Endemic', 'Hemocoraxius\' Endemic', 'Natigo\'s Endemic', 'Silbar\'s Endemic', 'Shiverback Endemic', --[[emu cutoff]] 'Malaria', 'Sicken'},
+        Spells={'Fevered Endemic', 'Vampyric Endemic', 'Neemzaq\'s Endemic', 'Elkikatar\'s Endemic', 'Hemocoraxius\' Endemic', 'Natigo\'s Endemic', 'Silbar\'s Endemic', 'Shiverback Endemic', --[[emu cutoff]] 'Festering Malady', 'Malaria', 'Sicken'},
         Options={opt='USEDOTS', Gem=function() return (not BeastLord:isEnabled('USEMENDING') and 7) or (not BeastLord:isEnabled('USEALLIANCE') and 7) or nil end, condition=function() return state.burnActive end}
     },
     {-- DD DoT. Slot 8

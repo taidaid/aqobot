@@ -4,7 +4,8 @@ local logger = require('utils.logger')
 local modes = require('mode')
 
 local config = {
-    SETTINGS_FILE = ('%s/aqobot_%s_%s.lua'):format(mq.configDir, mq.TLO.EverQuest.Server(), mq.TLO.Me.CleanName()),
+    SETTINGS_FILE = ('%s/aqo/%s_%s_%s.lua'):format(mq.configDir, mq.TLO.EverQuest.Server(), mq.TLO.Me.CleanName(), mq.TLO.Me.Class.ShortName()),
+    SETTINGS_FILE_OLD = ('%s/aqobot_%s_%s.lua'):format(mq.configDir, mq.TLO.EverQuest.Server(), mq.TLO.Me.CleanName()),
 
     -- General settings
     MODE = {
@@ -615,30 +616,45 @@ end
 
 ---Load common settings from settings file
 ---@return table|nil @Returns a table containing the loaded settings file content.
+---@return boolean @Returns whether to save new settings file location
 function config.loadSettings()
-    if not config.fileExists(config.SETTINGS_FILE) then return nil end
-    local settings = assert(loadfile(config.SETTINGS_FILE))()
-    if not settings or not settings.common then return settings end
+    local settingsFile = nil
+    local saveNewSettings = false
+    if not config.fileExists(config.SETTINGS_FILE) then
+        if not config.fileExists(config.SETTINGS_FILE_OLD) then
+            return nil, false
+        else
+            settingsFile = config.SETTINGS_FILE_OLD
+        end
+    else
+        settingsFile = config.SETTINGS_FILE
+    end
+    local settings = assert(loadfile(settingsFile))()
+    if not settings or not settings.common then return settings, false end
     for setting,value in pairs(settings.common) do
         if config[setting] then config[setting].value = value end
     end
     modes.currentMode = modes.fromString(config.MODE.value)
     logger.timestamps = config.TIMESTAMPS and config.TIMESTAMPS.value or false
-    return settings
+    saveNewSettings = settingsFile == config.SETTINGS_FILE_OLD
+    return settings, saveNewSettings
 end
 
 local ignores = {}
 
 ---Load mob ignore lists file
 function config.loadIgnores()
-    local ignore_file = ('%s/%s'):format(mq.configDir, 'aqo_ignore.lua')
+    local ignore_file = ('%s/aqo/%s'):format(mq.configDir, 'aqo_ignore.lua')
+    local ignore_file_old = ('%s/%s'):format(mq.configDir, 'aqo_ignore.lua')
     if config.fileExists(ignore_file) then
         ignores = assert(loadfile(ignore_file))()
+    elseif config.fileExists(ignore_file_old) then
+        ignores = assert(loadfile(ignore_file_old))()
     end
 end
 
 function config.saveIgnores()
-    local ignore_file = ('%s/%s'):format(mq.configDir, 'aqo_ignore.lua')
+    local ignore_file = ('%s/aqo/%s'):format(mq.configDir, 'aqo_ignore.lua')
     mq.pickle(ignore_file, ignores)
 end
 

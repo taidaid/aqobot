@@ -123,7 +123,7 @@ local function buffSafetyCheck()
     if not torporLandedInCombat and mq.TLO.Me.Song('Transcendent Torpor')() and mq.TLO.Me.CombatState() == 'COMBAT' then
         torporLandedInCombat = true
     end
-    if torporLandedInCombat and mq.TLO.Me.CombatState() ~= 'COMBAT' and mq.TLO.Me.Song('Transcendent Torpor')() then
+    if (torporLandedInCombat or mq.TLO.SpawnCount('xtarhater radius 25')() == 0) and mq.TLO.Me.CombatState() ~= 'COMBAT' and mq.TLO.Me.Song('Transcendent Torpor')() then
         mq.cmdf('/removebuff "Transcendent Torpor"')
         torporLandedInCombat = false
     end
@@ -141,7 +141,7 @@ local function doLooting()
         if mq.TLO.Target.Type() == 'Corpse' then
             mq.cmd('/keypress CONSIDER')
             mq.delay(500)
-            mq.doevents('eventCannotRez')
+            mq.doevents('eventCannotRezNew')
             if state.cannotRez then
                 state.cannotRez = nil
                 mq.cmd('/corpse')

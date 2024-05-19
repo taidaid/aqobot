@@ -135,7 +135,7 @@ Ranger.SpellLines = {
     {Group='predator', Spells={'Shriek of the Predator', 'Bay of the Predator', 'Howl of the Predator', 'Spirit of the Predator'}, Options={alias='SHOUT', selfbuff=true, Gem=function(lvl) return lvl <= 70 and 9 or nil end}}, -- Frostroar of the Predator
     {Group='strength', Spells={'Strength of the Fernstalker', 'Strength of the Dusksage Stalker', 'Strength of the Hunter', 'Strength of Tunare', --[[emu cutoff]] 'Strength of Earth'}, Options={Gem=function(lvl) return lvl <= 70 and 8 or nil end, alias='STRENGTH', selfbuff=true}}, -- Strength of the Arbor Stalker
     -- Unity AA Buffs
-    {Group='protection', Spells={'Protection of Pal\'Lomen', 'Protection of the Valley', 'Ward of the Hunter', 'Protection of the Wild'}, Options={selfbuff=true}}, -- Protection of the Wakening Land
+    -- {Group='protection', Spells={'Protection of Pal\'Lomen', 'Protection of the Valley', 'Ward of the Hunter', 'Protection of the Wild'}, Options={selfbuff=true}}, -- Protection of the Wakening Land
     {Group='eyes', Spells={'Eyes of the Phoenix', 'Eyes of the Senshali', 'Eyes of the Hawk', 'Eyes of the Owl'}, Options={Gem=function(lvl) return lvl <= 70 and 12 or nil end, selfbuff=true}}, -- Eyes of the Visionary
     {Group='hunt', Spells={'Engulfed by the Hunt', 'Steeled by the Hunt'}}, -- Provoked by the Hunt
     {Group='coat', Spells={'Needlespike Coat', 'Moonthorn Coat', --[[emu cutoff]] 'Bramblecoat', 'Barbcoat'}}, -- Rimespur Coat
@@ -155,6 +155,7 @@ Ranger.SpellLines = {
     -- Therapeutic Balm, cure/heal
     -- Devastating Spate, dd proc?
     {Group='heal', Spells={'Sylvan Water', 'Sylvan Light', 'Healing', 'Light Healing', 'Minor Healing', 'Salve'}, Options={Gem=function(lvl) return (lvl <= 60 and 7) or (lvl <= 70 and 10) or nil end, heal=true, regular=true}},
+    {Group='joltspell', Spells={'Cinder Jolt'}, Options={Gem=function(lvl) return lvl <= 70 and 12 or nil end, fade=true}}
 }
 
 Ranger.compositeNames = {['Ecliptic Fusillade']=true, ['Composite Fusillade']=true, ['Dissident Fusillade']=true, ['Dichotomic Fusillade']=true}
@@ -232,7 +233,7 @@ Ranger.Abilities = {
     {
         Type='AA',
         Name='Auspice of the Hunter',
-        Options={first=true, alias='AUSPICE'}
+        Options={alias='AUSPICE'}-- first=true, 
     },
     { -- swarm pets, 15min CD
         Type='AA',
@@ -279,6 +280,11 @@ Ranger.Abilities = {
         Type='AA',
         Name='Poison Arrows',
         Options={first=true, nodmz=true} -- opt='USEPOISONARROW'
+    },
+    {
+        Type='AA',
+        Name='Volatile Arrow',
+        Options={first=true}
     },
     { -- melee dmg buff, 19.5min CD, timer 2, Arbor Stalker's Discipline
         Type='Disc',

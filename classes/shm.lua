@@ -116,7 +116,7 @@ Shaman.SpellLines = {
     {-- proc buff slow + heal, 240 charges. Slot 1
         Group='slowproc',
         Spells={'Moroseness', 'Melancholy', 'Ennui', 'Incapacity', 'Sluggishness', 'Lingering Sloth'},
-        Options={Gem=function() return Shaman:get('SPELLSET') ~= 'dps' and 1 or nil end, singlebuff=true, classes={WAR=true,PAL=true,SHD=true}}
+        Options={Gem=function() return Shaman:get('SPELLSET') ~= 'dps' and 1 or nil end, alias='SLOWPROC', singlebuff=true, classes={WAR=true,PAL=true,SHD=true}}
     },
     {-- DPS spellset. Disease DoT. Slot 1
         Group='maladydot',
@@ -156,7 +156,7 @@ Shaman.SpellLines = {
     {-- disease dot. Not used directly, only by combo spell. Combo spell comes in non-level increase expansions. (pendemiccombo)
         Group='breathdot',
         Spells={'Breath of the Hotariton', 'Breath of the Tegi', 'Breath of Bledrek', 'Breath of Elkikatar', 'Breath of Hemocoraxius', 'Breath of Wunshi'},
-        Options={opt='USEDOTS', Gem=function(lvl) return (lvl <= 70 and 5) or (not Shaman.spells.pandemiccombo and Shaman:get('SPELLSET') == 'dps' and 5) or nil end}
+        Options={opt='USEDOTS', Gem=function(lvl) return (not Shaman:get('USEDISPEL') and lvl <= 70 and 5) or (not Shaman.spells.pandemiccombo and Shaman:get('SPELLSET') == 'dps' and 5) or nil end}
     },
     {-- temp hp buff. Slot 6
         Group='growth',
@@ -170,8 +170,8 @@ Shaman.SpellLines = {
     },
     {-- group heal. Slot 7
         Group='recourse',
-        Spells={'Grayleaf\'s Recourse', 'Rowain\'s Recourse', 'Zrelik\'s Recourse', 'Eyrzekla\'s Recourse', 'Krasir\'s Recourse', 'Word of Reconstitution', 'Word of Restoration', 'Word of Health'},
-        Options={alias='GROUPHEAL', Gem=function() return Shaman:get('SPELLSET') == 'standard' and 7 or nil end, group=true}
+        Spells={'Grayleaf\'s Recourse', 'Rowain\'s Recourse', 'Zrelik\'s Recourse', 'Eyrzekla\'s Recourse', 'Krasir\'s Recourse', --[[emu cutoff]] 'Word of Reconstitution', 'Word of Restoration', 'Word of Health'},
+        Options={alias='GROUPHEAL', Gem=function() return Shaman:get('SPELLSET') == 'standard' and 7 or nil end, group=true, cure=true, Disease=true, Poison=true, Curse=true}
     },
     {-- DPS spellset. Slot 7
         Group='poisonnuke',
@@ -248,10 +248,10 @@ Shaman.SpellLines = {
     {Group='rgc', Spells={'Remove Greater Curse', 'Remove Curse', 'Remove Lesser Curse', 'Remove Minor Curse'}, Options={cure=true, Curse=true}},
 
     -- TODO: cleanup Leftover EMU specific stuff
-    {Group='torpor', Spells={'Transcendent Torpor'}, Options={alias='HOT'}},
+    {Group='torpor', Spells={'Transcendent Torpor'}, Options={alias='HOT', hot=true, opt='USEHOTTANK'}},
     {Group='hot', Spells={'Celestial Health', 'Celestial Remedy'}, Options={}},
     {Group='idol', Spells={'Idol of Malos'}, Options={opt='USEDEBUFF', debuff=true, condition=function() return mq.TLO.Spawn('Spirit Idol')() ~= nil end}},
-    {Group='dispel', Spells={'Abashi\'s Disempowerment', 'Cancel Magic'}, Options={opt='USEDISPEL', debuff=true}},
+    {Group='dispel', Spells={'Abashi\'s Disempowerment', 'Cancel Magic'}, Options={opt='USEDISPEL', debuff=true, Gem=function(lvl) return lvl <= 70 and 5 or nil end}},
     {Group='debuff', Spells={'Crippling Spasm', 'Listless Power', 'Disempower'}, Options={opt='USEDEBUFF', debuff=true}},
     {Group='disdebuff', Spells={'Insidious Malady', 'Insidious Fever'}, Options={opt='USEDEBUFF', debuff=true}},
     -- EMU special: Ice Age nuke has 25% chance to proc slow
@@ -280,7 +280,7 @@ Shaman.SpellLines = {
 
     -- Buffs
     {Group='proc', Spells={'Spirit of the Leopard', 'Spirit of the Jaguar'}, Options={classes={MNK=true,BER=true,ROG=true,BST=true,WAR=true,PAL=true,SHD=true}, singlebuff=true}},
-    {Group='champion', Spells={'Champion', 'Ferine Avatar'}},
+    {Group='champion', Spells={'Champion', 'Ferine Avatar'}, Options={Gem=function(lvl) return lvl <= 70 and 2 or nil end, alias='CHAMPION', combatbuffothers=true}},
     {Group='panther', Spells={'Talisman of the Panther'}, Options={selfbuff=function() return not mq.TLO.FindItem('Imbued Rune of the Panther')() and true or false end}},
     -- {Group='talisman', Spells={'Talisman of Unification'}, Options={group=true, self=true, classes={WAR=true,SHD=true,PAL=true}})
     -- {Group='focus', Spells={'Talisman of Wunshi'}, Options={classes={WAR=true,SHD=true,PAL=true}})
@@ -374,7 +374,7 @@ Shaman.SpellLines = {
         Group='rain',
         Spells={'Gale of Poison', 'Poison Storm'},
         Options={opt='USEAOE'}
-    }
+    },
 }
 
 Shaman.compositeNames = {['Ecliptic Roar']=true,['Composite Roar']=true,['Dissident Roar']=true,['Roar of the Lion']=true}
@@ -457,6 +457,11 @@ Shaman.Abilities = {
         Name='Fundament: First Spire of Ancestors',
         Options={first=true}
     },
+    {
+        Type='AA',
+        Name='Dampen Resistance',
+        Options={first=true}
+    },
     -- table.insert(self.burnAbilities, common.getItem('Blessed Spiritstaff of the Heyokah'), {first=true}) -- 2.0 click
     -- table.insert(self.burnAbilities, self:addAA('Spire of Ancestors'), {first=true}) -- inc total healing, dot crit
     -- table.insert(self.burnAbilities, self:addAA('Apex of Ancestors'), {first=true}) -- inc proc mod, accuracy, min dmg
@@ -514,7 +519,17 @@ Shaman.Abilities = {
         Name='Turgur\'s Swarm',
         Options={debuff=true, opt='USESLOW'}
     },
+    {
+        Type='AA',
+        Name='Tigir\'s Insect Swarm',
+        Options={debuff=true, opt='USESLOWAOE'}
+    },
 
+    {
+        Type='AA',
+        Name='Purified Spirits',
+        Options={cure=true, all=true, self=true}
+    },
     -- Defensives
     {
         Type='AA',
@@ -542,8 +557,8 @@ function Shaman:initHeals()
     table.insert(self.healAbilities, self.spells.recourse) -- group heal, several stages of healing
     table.insert(self.healAbilities, self.spells.intervention) -- longer refresh quick group heal
     table.insert(self.healAbilities, self.spells.grouphot)
-    table.insert(self.healAbilities, self.spells.hottank)
-    table.insert(self.healAbilities, self.spells.hotdps)
+    table.insert(self.healAbilities, self.spells.singletank)
+    table.insert(self.healAbilities, self.spells.torpor)
 end
 
 return Shaman

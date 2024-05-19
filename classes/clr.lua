@@ -167,7 +167,7 @@ Cleric.SpellLines = {
     {-- large proc heal on near death. Slot 6
         Group='di',
         Spells={'Divine Interference', 'Divine Mediation', 'Divine Intermediation', 'Divine Imposition', 'Divine Indemnification', 'Divine Interposition', 'Divine Invocation', 'Divine Intercession', --[[emu cutoff]] 'Divine Intervention'},
-        Options={Gem=6, alias='DI', classes={WAR=true,SHD=true,PAL=true}, nodmz=true}
+        Options={Gem=6, alias='DI', classes={WAR=true,SHD=true,PAL=true}, nodmz=true, combatbuffothers=true}
     },
     {-- Large quick heal, heals more the lower the targets hp. Slot 7
         Group='seventeenth',
@@ -192,12 +192,12 @@ Cleric.SpellLines = {
     {-- Group heal with cure component. Slot 8
         Group='grouphealcure',
         Spells={'Word of Greater Vivification', 'Word of Greater Rejuvenation', 'Word of Greater Replenishment', 'Word of Greater Restoration', 'Word of Greater Reformation', 'Word of Reformation', 'Word of Rehabilitation', 'Word of Resurgence', --[[emu cutoff]] 'Word of Vivification', 'Word of Replenishment', 'Word of Redemption'},
-        Options={alias='GROUPHEAL', Gem=function(lvl) return (lvl <= 70 and 8) or (Cleric:isEnabled('USESPLASH') and 8) or nil end, threshold=3, regular=true, single=true, group=true, pct=70, cure=true, all=true}
+        Options={alias='GROUPHEAL', Gem=function(lvl) return (lvl <= 70 and 8) or (Cleric:isEnabled('USESPLASH') and 8) or nil end, threshold=3, regular=true, single=true, group=true, pct=70, cure=true, Disease=true, Poison=true, Curse=true}
     },
     {-- Regular group heal. Slot 9
         Group='grouphealquick',
         Spells={'Syllable of Acceptance', 'Syllable of Invigoration', 'Syllable of Soothing', 'Syllable of Mending', 'Syllable of Convalescence', 'Syllable of Renewal', --[[emu cutoff]]},
-        Options={Gem=8, threshold=3, regular=true, single=true, group=true, pct=70}
+        Options={Gem=8, threshold=3, regular=true, single=true, group=true, grouppanic=true, pct=70}
     },
     {-- Slot 10
         Group='composite',
@@ -319,13 +319,18 @@ Cleric.Abilities = {
     },
     {
         Type='Item',
+        Name='Aegis of Superior Divinity',
+        Options={heal=true, panic=true, grouppanic=true}
+    },
+    {
+        Type='Item',
         Name='Harmony of the Soul',
-        Options={heal=true, panic=true}
+        Options={heal=true, panic=true, grouppanic=true}
     },
     {
         Type='AA',
         Name='Divine Arbitration',
-        Options={heal=true, panic=true}
+        Options={heal=true, panic=true, grouppanic=true}
     },
 
     -- Buff

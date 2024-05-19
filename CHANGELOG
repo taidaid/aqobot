@@ -1,3 +1,19 @@
+# 2024/05/18
+- Add bard options USEJONTHANS, USEAMPLIFICATION
+- Update ability init to check more than first 5 spell slots for various SPAs
+- Add debuff to bst class order
+- Add combatbuffothers flag to abilities like DI or reptile skin
+- Move config into config/aqo subfolder
+- Add new DEBUFFONPULL option to enc to control whether debuffs should wait for assist
+- Some fixes to nowcast / buff requests
+- Add clr 2.0
+- Misc spell updates
+- Remove auspice from ranger burns. Control it manually
+- USEEPIC option for rogue 2.0 to keep up as combat buff, otherwise just part of burns
+- Add champion and SE into buff begging
+- Update corpse rez event check for lazarus
+- Tweaks to healing logic
+
 # 2024/04/21
 - Add SLOWALL option for shaman. May be buggy as it resist count tracking is based on current assist target only, so may screw up some if stuff resists
 

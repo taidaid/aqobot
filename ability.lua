@@ -737,13 +737,18 @@ function Ability:setCommonSpellData(spellRef)
 
     if spellRef.HasSPA(374)() then
         -- Trigger spell SPA
-        for i=1,5 do
+        for i=1,12 do
             if spellRef.Attrib(i)() == 374 then
                 local triggerName = spellRef.Trigger(i).BaseName()
                 if spellRef.Trigger(i).HasSPA(58)() then
                     -- Change form SPA
                     self.RemoveBuff = triggerName
                     self.CheckFor = spellRef.BaseName()
+                elseif spellRef.Trigger(i).HasSPA(33)() then
+                    -- Summon familiar SPA
+                    self.RemoveBuff = triggerName
+                    self.CheckFor = spellRef.BaseName()
+                    self.RemoveFamiliar = true
                 else
                     self.CheckFor = triggerName
                 end
@@ -755,7 +760,7 @@ function Ability:setCommonSpellData(spellRef)
     elseif spellRef.HasSPA(470)() then
         self.CheckFor = spellRef.Trigger(1).BaseName()
     elseif spellRef.HasSPA(340)() then
-        for i=1,5 do
+        for i=1,12 do
             if spellRef.Attrib(i)() == 340 then
                 self.CheckFor = spellRef.Trigger(i).BaseName()
                 self.Duration = spellRef.Trigger(i).Duration()

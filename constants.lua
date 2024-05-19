@@ -48,8 +48,10 @@ constants.bufflines = {
     {key='SHOUT', label='Shout (Ranger HP)', category='Standard'},
     {key='BRELLS', label='Brells (Paladin HP)', category='Standard'},
     {key='SV', label='SV (Beast Lord HP)', category='Standard'},
-    {key='REGEN', label='Regen', category='Standard'},
+    {key='SE', label='SE (Beast Lord Regen)', category='Standard'},
+    -- {key='REGEN', label='Regen', category='Standard'},
     -- Stat Buffs
+    {key='CHAMPION', label='Champion', category='Stats'},
     {key='STR', label='Strength', category='Stats'},
     {key='CHA', label='Charisma', category='Stats'},
     {key='DEX', label='Dexterity', category='Stats'},
@@ -66,6 +68,7 @@ constants.bufflines = {
     {key='DI', label='Divine Intervention', category='Procs'},
     {key='RUNE', label='Rune', category='Procs'},
     {key='MANAPROC', label='Mana DD Proc (Enchanter)', category='Procs'},
+    {key='SLOWPROC', label='Slow Proc', category='Procs'},
     -- Resist Buffs
     {key='RESFIRE', label='Resist Fire', category='Resists'},
     {key='RESCOLD', label='Resist Cold', category='Resists'},
@@ -91,6 +94,7 @@ constants.buffs = {
         DS = true,
         NECROTIC = false,
         REPTILE = false,
+        CHAMPION = true,
     },
     BRD = {
         AEGO = false,
@@ -106,6 +110,7 @@ constants.buffs = {
         DS = true,
         NECROTIC = false,
         REPTILE = false,
+        CHAMPION = true,
     },
     MNK = {
         AEGO = false,
@@ -121,6 +126,7 @@ constants.buffs = {
         DS = true,
         NECROTIC = false,
         REPTILE = false,
+        CHAMPION = true,
     },
     ROG = {
         AEGO = false,
@@ -136,6 +142,7 @@ constants.buffs = {
         DS = true,
         NECROTIC = false,
         REPTILE = false,
+        CHAMPION = true,
     },
 
     CLR = {
@@ -194,6 +201,8 @@ constants.buffs = {
         DS = true,
         DI = true,
         VIE = true,
+        SLOWPROC = true,
+        CHAMPION = true,
     },
     SHD = {
         AEGO = true,
@@ -211,6 +220,8 @@ constants.buffs = {
         DS = true,
         DI = true,
         VIE = true,
+        SLOWPROC = true,
+        CHAMPION = true,
     },
     WAR = {
         AEGO = false,
@@ -229,6 +240,8 @@ constants.buffs = {
         DS = true,
         DI = true,
         VIE = true,
+        SLOWPROC = true,
+        CHAMPION = true,
     },
 
     ENC = {
@@ -303,6 +316,7 @@ constants.buffs = {
         REPTILE = true,
         DMF = true,
         DS = true,
+        CHAMPION = true,
     },
     RNG = {
         SE = true,
@@ -316,6 +330,7 @@ constants.buffs = {
         REPTILE = true,
         DMF = true,
         DS = true,
+        CHAMPION = true,
     },
 }
 

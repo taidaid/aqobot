@@ -60,22 +60,24 @@ function ShadowKnight:initClassOptions()
     self:addOption('USEDEFLECTION', 'Use Deflection', false, nil, 'Toggle use of deflection discipline', 'checkbox', nil, 'UseDeflection', 'bool')
     self:addOption('DONTCAST', 'Don\'t Cast', false, nil, 'Don\'t cast spells in combat', 'checkbox', nil, 'DontCast', 'bool')
     self:addOption('USEEPIC', 'Use Epic', true, nil, 'Use epic in burns', 'checkbox', nil, 'UseEpic', 'bool')
+    self:addOption('USEDOTTAP', 'Use DoT Tap', false, nil, 'Use DoT lifetap', 'checkbox', nil, 'UseDotTap', 'bool')
+    self:addOption('USEDOTS', 'Use DoTs', true, nil, 'Use DoTs', 'checkbox', nil, 'UseDoTs', 'bool')
 end
 
 ShadowKnight.SpellLines = {
     {-- Regular lifetap. Slot 1
         Group='tap1',
-        Spells={'Touch of Flariton', 'Touch of Txiki', 'Touch of Draygun', 'Touch of Innoruuk', --[[emu cutoff]] 'Lifedraw', 'Lifespike', 'Lifetap'},
+        Spells={'Touch of Flariton', 'Touch of Txiki', --[[emu cutoff]] 'Touch of the Devourer', 'Touch of Innoruuk', 'Lifedraw', 'Lifespike', 'Lifetap'},
         Options={Gem=1, condition=function() return mq.TLO.Me.PctHPs() < 85 end}
     },--, 'Drain Soul', 'Lifedraw'})
     {-- Temp buff (Gift of) lifetap. Slot 2
         Group='tap2',
-        Spells={'Touch of Mortimus', 'Touch of Namdrows', 'Touch of the Devourer', 'Touch of Volatis'},
+        Spells={'Touch of Mortimus', 'Touch of Namdrows', --[[emu cutoff]] 'Touch of Draygun', 'Touch of Volatis'},
         Options={Gem=2}
     },
     {-- large lifetap. Slot 3
         Group='largetap',
-        Spells={'Dire Rebuke', 'Dire Censure'},
+        Spells={'Dire Rebuke', 'Dire Censure', --[[emu cutoff]] 'Touch of Inruku'},
         Options={Gem=3, condition=function() return mq.TLO.Me.PctHPs() < 85 end}
     },
     {-- big lifetap. Slot 4
@@ -97,7 +99,7 @@ ShadowKnight.SpellLines = {
     {
         Group='poison',
         Spells={'Blood of Shoru', 'Blood of Tearc', 'Blood of Inruku', 'Blood of Pain', --[[emu cutoff]] 'Heat Blood'},
-        Options={Gem=function(lvl) return (ShadowKnight:get('SPELLSET') == 'dps' and 6) or (lvl <= 60 and 4) or nil end}
+        Options={opt='USEDOTS', Gem=function(lvl) return (ShadowKnight:get('SPELLSET') == 'dps' and 6) or (lvl <= 60 and 4) or nil end}
     },
     {-- ST increase hate by 1. Slot 7
         Group='aeterror',
@@ -112,12 +114,12 @@ ShadowKnight.SpellLines = {
     {-- DPS spellset. disease dot. Slot 7
         Group='disease',
         Spells={'Plague of the Fleawalker', 'Plague of Fleshrot', --[[emu cutoff]] 'Disease Cloud'},
-        Options={Gem=function(lvl) return (ShadowKnight:get('SPELLSET') == 'dps' and 7) or (lvl <= 60 and 3) or nil end}
+        Options={opt='USEDOTS', Gem=function(lvl) return (ShadowKnight:get('SPELLSET') == 'dps' and 7) or (lvl <= 60 and 3) or nil end}
     },
     {-- lifetap dot. Slot 8
         Group='dottap',
         Spells={'Bond of Tatalros', 'Bond of Bynn', 'Bond of Inruku'},
-        Options={Gem=function(lvl) return lvl <= 70 and 3 or 8 end}
+        Options={opt='USEDOTTAP', Gem=function(lvl) return lvl <= 70 and 3 or 8 end}
     },
     {-- main hate spell. Slot 9
         Group='challenge',
@@ -127,7 +129,7 @@ ShadowKnight.SpellLines = {
     {-- DPS spellset. corruption dot. Slot 9
         Group='corruption',
         Spells={'Vitriolic Blight', 'Unscrupulous Blight'},
-        Options={Gem=function() return ShadowKnight:get('SPELLSET') == 'dps' and 9 or nil end}
+        Options={opt='USEDOTS', Gem=function() return ShadowKnight:get('SPELLSET') == 'dps' and 9 or nil end}
     },
     {-- ac debuff. Slot 10
         Group='acdebuff',
@@ -137,7 +139,7 @@ ShadowKnight.SpellLines = {
     {-- temp HP buff, 2.5min. Slot 11
         Group='stance',
         Spells={'Unwavering Stance', 'Adamant Stance', 'Vampiric Embrace'},
-        Options={Gem=function(lvl) return lvl <= 60 and 6 or 11 end}
+        Options={Gem=function(lvl) return lvl > 70 and 11 end}
     },
     {-- Xenacious' Skin proc, 5min buff. Slot 12
         Group='skin',
@@ -149,6 +151,11 @@ ShadowKnight.SpellLines = {
         Spells={'Charka\'s Bite', 'Cruor\'s Bite', 'Ancient: Bite of Muram', 'Zevfeer\'s Bite', 'Inruku\'s Bite'},
         Options={Gem=function(lvl) return (lvl <= 70 and 4) or (ShadowKnight:isEnabled('USETORRENT') and 13) or 10 end}
     },
+    {-- lifetap with hp/mana recourse. Slot 13
+        Group='bitetap2',
+        Spells={'Inruku\'s Bite'},
+        Options={Gem=function(lvl) return lvl <= 70 and 12 end}
+    },
     {-- Slot 13
         Group='tap3',
         Spells={'Touch of Drendar'},
@@ -158,7 +165,7 @@ ShadowKnight.SpellLines = {
     {Group='alliance', Spells={'Bloodletting Conjunction', 'Bloodletting Coalition', 'Bloodletting Covenant', 'Bloodletting Alliance'}}, -- alliance
     --['']={'Oppressor\'s Audacity', 'Usurper\'s Audacity'}), -- increase hate by a lot, does this get used?
 
-    {Group='acdis', Spells={'Dire Squelch', 'Dire Seizure'}}, -- disease + ac dot
+    {Group='acdis', Spells={'Dire Squelch', 'Dire Seizure'}, Options={opt='USEDOTS'}}, -- disease + ac dot
     --['']={'Odious Bargain', 'Despicable Bargain'}), -- ae hate nuke, does this get used?
     -- Short Term Buffs
     {Group='disruption', Spells={'Confluent Disruption', 'Scream of Death'}}, -- lifetap proc on heal
@@ -197,6 +204,7 @@ function ShadowKnight:initSpellRotations()
     table.insert(self.spellRotations.standard, self.spells.largetap)
     table.insert(self.spellRotations.standard, self.spells.tap1)
     table.insert(self.spellRotations.standard, self.spells.tap2)
+    table.insert(self.spellRotations.standard, self.spells.bitetap2)
     table.insert(self.spellRotations.standard, self.spells.dottap)
     table.insert(self.spellRotations.standard, self.spells.acdebuff)
     table.insert(self.spellRotations.standard, self.spells.tap3)
@@ -211,6 +219,7 @@ function ShadowKnight:initSpellRotations()
     table.insert(self.spellRotations.dps, self.spells.dottap)
     table.insert(self.spellRotations.dps, self.spells.disease)
     table.insert(self.spellRotations.dps, self.spells.bitetap)
+    table.insert(self.spellRotations.dps, self.spells.bitetap2)
     table.insert(self.spellRotations.dps, self.spells.acdebuff)
     table.insert(self.spellRotations.dps, self.spells.tap3)
 end
@@ -295,12 +304,12 @@ ShadowKnight.Abilities = {
     { -- 45 sec cd
         Type='AA',
         Name='Explosion of Spite',
-        Options={tanking=true, threshold=2, condition=conditions.aboveMobThreshold}
+        Options={opt='USEAOE', tanking=true, threshold=2, condition=conditions.aboveMobThreshold}
     },
     { -- 45 sec cd
         Type='AA',
         Name='Explosion of Hatred',
-        Options={tanking=true, threshold=4, condition=conditions.aboveMobThreshold}
+        Options={opt='USEAOE', tanking=true, threshold=4, condition=conditions.aboveMobThreshold}
     },
     -- { -- large frontal cone ae aggro
     --     Type='AA',
@@ -430,6 +439,11 @@ ShadowKnight.Abilities = {
         Type='AA',
         Name='Voice of Thule',
         Options={selfbuff=true, opt='USEVOICEOFTHULE'}
+    },
+    {
+        Type='AA',
+        Name='Fortify Companion',
+        Options={petbuff=true}
     },
 
     {

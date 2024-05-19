@@ -190,7 +190,7 @@ function assist.checkMATargetSwitch(assistMobID)
     -- If already fighting, check whether we're already on the MA's target. If not, only continue if switch with MA is enabled.
     if mq.TLO.Me.CombatState() == 'COMBAT' then
         logger.debug(logger.flags.routines.assist, "state is combat")
-        if mq.TLO.Target.ID() == assistMobID then
+        if mq.TLO.Target.ID() == assistMobID and (mq.TLO.Target.PctHPs() or 101) < config.get('AUTOASSISTAT') then
             -- already fighting the MAs target, make sure assistMobID is accurate
             state.assistMobID = assistMobID
             return false

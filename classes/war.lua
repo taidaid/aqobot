@@ -229,6 +229,11 @@ Warrior.Abilities = {
         Names={'Warrior\'s Resolve', 'Warrior\'s Aegis'},
         Options={tankburn=true}
     },
+    { -- 10m cd, proc every swing for 12s
+        Type='AA',
+        Name='Rage of Rallos Zek',
+        Options={tankburn=true}
+    },
 
     {
         Type='Disc',

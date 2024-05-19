@@ -96,26 +96,19 @@ local function buffSelf(base)
                 if buff.TargetType == 'Single' then mq.TLO.Me.DoTarget() end
                 result = abilities.use(buff, base, true)
                 if result then
-                    if buff.RemoveBuff then
-                        state.queuedAction = function()
-                            if mq.TLO.Me.Casting() then
-                                return state.queuedAction
-                            else
-                                mq.delay(100, function() return mq.TLO.Me.Buff(buff.RemoveBuff)() end)
-                                if mq.TLO.Me.Buff(buff.RemoveBuff)() then
-                                    logger.info('Removing buff \ag%s\ax', buff.RemoveBuff)
-                                    mq.cmdf('/removebuff "%s"', buff.RemoveBuff)
-                                end
-                            end
-                        end
-                    elseif buff.RemoveFamiliar then
+                    if buff.RemoveBuff or buff.RemoveFamiliar then
                         state.giveUpTimer = timer:new(5000)
                         state.queuedAction = function()
-                            if mq.TLO.Me.Casting() or mq.TLO.Pet.ID() == 0 then
+                            if mq.TLO.Me.Casting() or (buff.RemoveFamiliar and mq.TLO.Pet.ID() == 0) then
                                 if state.giveUpTimer:expired() then state.giveUpTimer = nil return nil end
                                 return state.queuedAction
                             else
-                                if mq.TLO.Pet.ID() > 0 and (mq.TLO.Pet.Level() == 1 or mq.TLO.Pet.CleanName():find('familiar')) then
+                                mq.delay(100, function() return mq.TLO.Me.Buff(buff.RemoveBuff)() end)
+                                if buff.RemoveBuff and mq.TLO.Me.Buff(buff.RemoveBuff)() then
+                                    logger.info('Removing buff \ag%s\ax', buff.RemoveBuff)
+                                    mq.cmdf('/removebuff "%s"', buff.RemoveBuff)
+                                end
+                                if buff.RemoveFamiliar and mq.TLO.Pet.ID() > 0 and (mq.TLO.Pet.Level() == 1 or mq.TLO.Pet.CleanName():find('familiar')) then
                                     logger.info('Removing familiar')
                                     mq.cmdf('/squelch /pet get lost')
                                 end
@@ -153,21 +146,29 @@ local function buffSingle(base)
     end
 end
 
+local buffActorsCombatTimer = timer:new(5000)
 -- buff characters on the same post office
-local function buffActors(base)
+local function buffActors(base, combat)
+    if combat then
+        if not base.combatbuffothers or not buffActorsCombatTimer:expired() then return end
+        buffActorsCombatTimer:reset()
+    end
     local availableBuffs = base:getRequestAliases()
     for name, charState in pairs(state.actors) do
         local wantBuffs = charState.wantBuffs
         if wantBuffs then
             for _,aBuff in ipairs(wantBuffs) do
                 if availableBuffs[aBuff] then
-                    -- logger.info('Can cast buff %s for %s', availableBuffs[aBuff], name)
-                    local spawn = mq.TLO.Spawn('pc ='..name..' radius 150')
-                    if spawn() then
-                        spawn.DoTarget()
-                        mq.delay(1000, function() return mq.TLO.Target.BuffsPopulated() end)
-                        if mq.TLO.Target.ID() == spawn.ID() and not mq.TLO.Target.Buff(availableBuffs[aBuff])() then
-                            if abilities.use(base:getAbilityForAlias(aBuff), base, true, true) then return true end
+                    local theBuff = base:getAbilityForAlias(aBuff)
+                    if not combat or theBuff.combatbuffothers then
+                        -- logger.info('Can cast buff %s for %s', availableBuffs[aBuff], name)
+                        local spawn = mq.TLO.Spawn('pc ='..name..' radius 150')
+                        if spawn() then
+                            spawn.DoTarget()
+                            mq.delay(1000, function() return mq.TLO.Target.BuffsPopulated() end)
+                            if mq.TLO.Target.ID() == spawn.ID() and not mq.TLO.Target.Buff(availableBuffs[aBuff])() then
+                                if abilities.use(theBuff, base, true, true) then return true end
+                            end
                         end
                     end
                 end
@@ -231,6 +232,7 @@ function buff.buff(base)
     if not state.justZonedTimer:expired() then return false end
     checkClickiesLoaded(base)
     if buffCombat(base) then return true end
+    if buffActors(base, true) then return true end
 
     if not common.clearToBuff() or not buffOOCTimer:expired() or mq.TLO.Me.Moving() then return end
     buffOOCTimer:reset()

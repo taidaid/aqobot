@@ -114,10 +114,10 @@ function common.getItem(itemName, options)
     if itemRef() and itemRef.Clicky() then
         if not options then options = {} end
         local spellData = {ID=itemRef.ID(), Name=itemRef.Name()}
-        logger.info('Found Item: %s', itemRef.ItemLink('CLICKABLE'))
         for key,value in pairs(options) do
             spellData[key] = value
         end
+        logger.info('Found Item: %s', itemRef.ItemLink('CLICKABLE'))
         return abilities.Item:new(spellData)
     end
     return nil
@@ -337,7 +337,7 @@ function common.checkMana()
         for item,_ in pairs(modrods) do
             local modrod = mq.TLO.FindItem(item)
             local hp_amount = modrod.Spell.Base(1)()
-            if hp_amount and math.abs(hp_amount)*2 < mq.TLO.Me.CurrentHPs() then
+            if modrod() and hp_amount and math.abs(hp_amount)*2 < mq.TLO.Me.CurrentHPs() then
                 abilities.use(abilities.Item:new({Name=modrod(), ID=modrod.ID()}))
             end
         end

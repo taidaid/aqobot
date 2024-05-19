@@ -35,6 +35,7 @@ local state = {
     nuketimer = timer:new(0),
     sitTimer = timer:new(10000),
     -- ActAsLevel = 65
+    -- testCures = true,
 }
 
 function state.resetCombatState(debug, caller)

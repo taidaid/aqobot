@@ -699,6 +699,13 @@ local function drawAbilityInspector()
                             end
                             ImGui.TreePop()
                         end
+                    elseif list == 'requestAliases' then
+                        if ImGui.TreeNode(list..'##aliases'..i) then
+                            for alias,name in pairs(class.requestAliases) do
+                                ImGui.Text('%s: %s', alias, name)
+                            end
+                            ImGui.TreePop()
+                        end
                     end
                 end
                 if class.rezAbility then

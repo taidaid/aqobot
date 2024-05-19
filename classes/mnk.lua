@@ -65,9 +65,14 @@ Monk.Abilities = {
         Names={'Uncia\'s Fang', 'Zlexak\'s Fang', 'Hoshkar\'s Fang', 'Zalikor\'s Fang', 'Dragon Fang', 'Clawstriker\'s Flurry', 'Leopard Claw'},
         Options={dps=true, condition=conditions.withinMeleeDistance}
     },
-    { -- free flying kick + a stun, emu only?
+    -- { -- free flying kick + a stun, emu only?
+    --     Type='AA',
+    --     Name='Stunning Kick',
+    --     Options={dps=true, condition=conditions.withinMeleeDistance}
+    -- },
+    { -- free tiger claw, emu only?
         Type='AA',
-        Name='Stunning Kick',
+        Name='Eye Gouge',
         Options={dps=true, condition=conditions.withinMeleeDistance}
     },
     {
@@ -100,11 +105,6 @@ Monk.Abilities = {
         Type='Disc',
         Group='alliance',
         Names={'Bloodwalker\'s Conjunction', 'Icewalker\'s Coalition', 'Firewalker\'s Covenant', 'Doomwalker\'s Alliance'},
-        Options={dps=true, condition=conditions.withinMeleeDistance}
-    },
-    { -- large nuke, 5 min cd, should FD after
-        Type='AA',
-        Name='Five Point Palm',
         Options={dps=true, condition=conditions.withinMeleeDistance}
     },
     { -- emu only?
@@ -152,11 +152,6 @@ Monk.Abilities = {
         Name='Zan Fi\'s Thunderous Whistle',
         Options={first=true}
     },
-    { -- chance to inc melee dmg + nuke
-        Type='AA',
-        Name='Infusion of Thunder',
-        Options={first=true}
-    },
     {
         Type='Disc',
         Group='stance',
@@ -168,6 +163,11 @@ Monk.Abilities = {
         Group='heel',
         Names={'Heel of Zagali', 'Heel of Kai', 'Heel of Kanji'},
         Options={first=true}
+    },
+    { -- large nuke, 10 min cd, should FD after
+        Type='AA',
+        Name='Five Point Palm',
+        Options={first=true, condition=conditions.withinMeleeDistance}--dps=true,
     },
     -- 2nd burn
     { -- doubles attack speed
@@ -231,7 +231,7 @@ Monk.Abilities = {
     {
         Type='AA',
         Name='Infusion of Thunder',
-        Options={combatbuff=true}
+        Options={combatbuff=true, emu=true}
     },
     { -- large bonus dmg
         Type='Disc',

@@ -54,6 +54,8 @@ function Bard:initClassOptions()
     self:addOption('USEDISEASEDOTS', 'Use Disease DoT', false, nil, 'Toggle use of Disease DoT songs if they are in the selected song list', 'checkbox', nil, 'UseDiseaseDoTs', 'bool')
     self:addOption('USEREGENSONG', 'Use Regen Song', false, nil, 'Toggle use of hp/mana regen song line', 'checkbox', nil, 'UseRegenSong', 'bool')
     self:addOption('USESELOSAA', 'Use Selos AA', false, nil, 'Toggle use of Selos AA', 'checkbox', nil, 'UseSelosAA', 'bool')
+    self:addOption('USEJONTHANS', 'Use Jonthans', false, nil, 'Toggle use Jonthans self-only song', 'checkbox', nil, 'UseJonthans', 'bool')
+    self:addOption('USEAMPLIFICATION', 'Use Amplification', false, nil, 'Toggle use of Amplification song', 'checkbox', nil, 'UseAmplification', 'bool')
 end
 
 -- melee haste v98 (Bard Haste) (Composition of Ervaj (lvl 60), Melody of Ervaj (lvl 50))
@@ -87,7 +89,7 @@ Bard.SpellLines = {
     {-- fire dot. Slot 3
         Group='chantflame',
         Spells={'Kindleheart\'s Chant of Flame', 'Shak Dathor\'s Chant of Flame', 'Sontalak\'s Chant of Flame', 'Quinard\'s Chant of Flame', 'Nilsara\'s Chant of Flame', --[[emu cutoff]] 'Vulka\'s Chant of Flame', 'Tuyen\'s Chant of Fire', 'Tuyen\'s Chant of Flame'},
-        Options={opt='USEFIREDOTS', Gem=3, CheckFor=state.emu and 'Chant of Flame'}
+        Options={opt='USEFIREDOTS', Gem=function(lvl) return (not Bard:get('USEFROSTDOTS') and 2) or 3 end, CheckFor=state.emu and 'Chant of Flame'}
     },
     {-- melee dmg proc. Slot 4
         Group='suffering',
@@ -169,21 +171,22 @@ Bard.SpellLines = {
     {Group='emuhaste', Spells={'War March of Muram', 'War March of the Mastruq', 'McVaxius\' Rousing Rondo', 'McVaxius\' Berserker Crescendo', 'Vilia\'s Verses of Celerity', 'Anthem de Arms'}},
     {Group='snare', Spells={'Selo\'s Consonant Chain'}, Options={opt='USESNARE'}},
     {Group='debuff', Spells={'Harmony of Sound'}},
-    {Group='jonthans', Spells={'Jonthan\'s Whistling Warsong'}, Options={}},
+    {Group='jonthans', Spells={'Jonthan\'s Inspiration', 'Jonthan\'s Whistling Warsong'}, Options={opt='USEJONTHANS'}},
     {Group='magicweapons', Spells={'Magical Monologue'}, Options={}},
     {Group='chantmagic', Spells={'Fufil\'s Curtailing Chant'}, Options={}},
-    {Group='selos', Spells={'Selo\'s Accelerating Chorus', 'Selo\'s Rhythm of Speed', 'Selo\'s Accelerando'}, Options={Gem=function(lvl) return lvl <= 70 and 10 or nil end}},
+    {Group='selos', Spells={'Selo\'s Accelerating Chorus', 'Selo\'s Rhythm of Speed', 'Selo\'s Accelerando'}, Options={alias='SELOS', Gem=function(lvl) return lvl <= 70 and 10 or nil end}},
 
     {Group='aedot', Spells={'Denon\'s Disruptive Discord', 'Chords of Dissonance'}, Options={'USEAOE'}},
     {Group='aeslow', Spells={'Largo\'s Melodic Binding'}, Options={}},
     {Group='manasong', Spells={'Cassindra\'s Chorus of Clarity', 'Cassindra\'s Chant of Clarity'}, Options={}},
-    {Group='dispel', Spells={'Syvelian\'s Anti-Magic Aria', 'Alenia\'s Disenchanting Melody'}, Options={}}
+    {Group='dispel', Spells={'Syvelian\'s Anti-Magic Aria', 'Alenia\'s Disenchanting Melody'}, Options={}},
+    {Group='amplification', Spells={'Amplification'}, Options={opt='USEAMPLIFICATION', selfbuff=true, combatbuff=true}},
 }
 
 Bard.compositeNames = {['Ecliptic Psalm']=true,['Composite Psalm']=true,['Dissident Psalm']=true,['Dichotomic Psalm']=true}
 Bard.allDPSSpellGroups = {'aria', 'arcane', 'chantfrost', 'spiteful', 'firenukebuff', 'chantflame', 'suffering', 'insult', 'warmarch', 'sonata', 'firemagicdotbuff', 'chantdisease',
     'crescendo', 'pulse', 'composite', 'dirge', 'insultpushback', 'chantpoison', 'alliance', 'overhaste', 'bardhaste', 'emuhaste', 'snare', 'debuff', 'jonthans', 'magicweapons',
-    'chantmagic', 'aedot', 'aeslow', 'manasong', 'dispel'}
+    'chantmagic', 'aedot', 'aeslow', 'manasong', 'dispel', 'amplification', 'selos'}
 
 Bard.Abilities = {
     {
@@ -225,7 +228,7 @@ Bard.Abilities = {
     {
         Type='AA',
         Name='Selo\'s Sonata',
-        Options={key='selos'}
+        Options={key='selosaa'}
     },
 
     -- DPS
@@ -596,7 +599,7 @@ function Bard:findNextSong()
 end
 
 function Bard:cast()
-    if self:isEnabled('USETWIST') or mq.TLO.Me.Invis() then return false end
+    if self:isEnabled('USETWIST') or mq.TLO.Me.Invis() or state.paused then return false end
     if not mq.TLO.Me.Invis() and self:doneSinging() then
         --if mq.TLO.Target.Type() == 'NPC' and mq.TLO.Me.CombatState() == 'COMBAT' then
         if mq.TLO.Target.Type() == 'NPC' and mq.TLO.Me.Combat() then
@@ -705,8 +708,11 @@ function Bard:doneSinging()
         mq.delay(1)
     end
     if not mq.TLO.Me.Casting() then
-        if self:isEnabled('USESELOSAA') and self.selos and selosTimer:expired() then
-            self.selos:use()
+        if self:isEnabled('USESELOSAA') and self.selosaa and selosTimer:expired() then
+            self.selosaa:use()
+            selosTimer:reset()
+        elseif self.spells.selos and selosTimer:expired() then
+            self.spells.selos:use()
             selosTimer:reset()
         end
         return true

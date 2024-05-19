@@ -287,7 +287,7 @@ function guiLoot.RegisterActor()
 				if who ~= mq.TLO.Me() then who = mq.TLO.Spawn(string.format("%s", who)).Class.ShortName() else who = mq.TLO.Me.Class.ShortName() end
 			end
 
-			local text = string.format('\ao[%s] \at%s \ax%s %s', lootEntry.LootedAt, who, item.Action, link)
+			local text = string.format('\ao[%s] \at%s \ax%s %s (%s)', lootEntry.LootedAt, who, item.Action, link, lootEntry.ID)
 			guiLoot.console:AppendText(text)
 			-- do we want to record loot data?
 			if guiLoot.recordData then

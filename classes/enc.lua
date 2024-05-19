@@ -51,6 +51,7 @@ function Enchanter:initClassOptions()
     self:addOption('USEDEBUFF', 'Use Tash', false, nil, 'Toggle use of single target tash ability', 'checkbox', nil, 'UseDebuff', 'bool')
     self:addOption('USEDEBUFFAOE', 'Use Tash AOE', true, nil, 'Toggle use of AOE tash ability', 'checkbox', nil, 'UseDebuffAOE', 'bool')
     self:addOption('USEDISPEL', 'Use Dispel', true, nil, 'Dispel mobs with Eradicate Magic AA', 'checkbox', nil, 'UseDispel', 'bool')
+    self:addOption('DEBUFFONPULL', 'Debuff on Pull', true, nil, 'Debuff mobs immediately', 'checkbox', nil, 'DebuffOnPull', 'bool')
 end
 --[[
     edict of tashan
@@ -271,6 +272,11 @@ Enchanter.Abilities = {
     { -- decrease melee dmg + DoT
         Type='AA',
         Name='Mental Corruption',
+        Options={first=true}
+    },
+    {
+        Type='AA',
+        Name='Mental Contortion',
         Options={first=true}
     },
 

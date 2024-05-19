@@ -42,6 +42,7 @@ function status.callback(message)
     end
 end
 
+local ignoredebuffs = {['HC Jugular Gash']=true, ['Resurrection Sickness']=true, ['Revival Sickness']=true, ['HC Roar of Challenge']=true, ['Aura of Destruction']=true, ['HC Knuckle Smash']=true}
 local statusTimer = Timer:new(1000)
 function status.send(class)
     if not statusTimer:expired() then return end
@@ -51,7 +52,7 @@ function status.send(class)
     local buffs = {}
     for i=1,42 do
         local aBuff = mq.TLO.Me.Buff(i)
-        if aBuff() and not aBuff.Spell.Beneficial() then
+        if aBuff() and not aBuff.Spell.Beneficial() and not ignoredebuffs[aBuff.Name()] then
             local buffData = {Name=aBuff.Name(),Duration=aBuff.Duration.TotalSeconds()}
             if aBuff.CounterNumber() and (aBuff.CounterNumber() or 0) > 0 then
                 buffData.CounterNumber=aBuff.CounterNumber()
@@ -60,8 +61,13 @@ function status.send(class)
             table.insert(buffs, buffData)
         end
     end
-    -- table.insert(buffs, {Name='testing', Duration=15, CounterNumber=3, CounterType='Curse'})
-    -- table.insert(buffs, {Name='testing', Duration=15, CounterType='Curse'})
+    if state.testCures then
+        table.insert(buffs, {Name='Poison Debuff', Duration=60, CounterNumber=10, CounterType='Poison'})
+        -- table.insert(buffs, {Name='Corruption Debuff', Duration=60, CounterNumber=10, CounterType='Corruption'})
+        -- table.insert(buffs, {Name='Disease Debuff', Duration=60, CounterNumber=10, CounterType='Disease'})
+        -- table.insert(buffs, {Name='Curse Debuff', Duration=60, CounterNumber=10, CounterType='Curse'})
+        -- table.insert(buffs, {Name='Debuff', Duration=60})
+    end
     local songs = {}
     for i=1,20 do
         local aSong = mq.TLO.Me.Song(i)

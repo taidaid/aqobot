@@ -332,6 +332,7 @@ function base:addAbilityToLists(ability)
             if ability[flag] == true then
                 table.insert(self[abilityTableName], ability)
             end
+            if ability.combatbuffothers then self.combatbuffothers = true end
         end
     end
     if ability.rez then self.rezAbility = ability end
@@ -394,6 +395,8 @@ function base:getTableForClicky(clickyType)
         return self.petBuffs
     elseif clickyType == 'pull' then
         return self.pullClickies
+    elseif clickyType == 'debuff' then
+        return self.debuffs
     else
         logger.info('Unknown clicky type: %s', clickyType)
         return nil
@@ -473,6 +476,9 @@ function base:getRequestAliases()
             aliases[name] = ability.CastName
         end
     end
+    if self.requestAliases.HOT and self:isEnabled('USEHOTTANK') then
+        aliases.HOT = self.requestAliases.HOT.CastName
+    end
     return aliases
 end
 
@@ -481,7 +487,7 @@ function base:getAbilityForAlias(alias)
 end
 
 function base:loadSettings()
-    local settings = config.loadSettings()
+    local settings, doSave = config.loadSettings()
     if not settings or not settings[self.class] then return end
     for setting,value in pairs(settings[self.class]) do
         if self.options[setting] == nil then
@@ -510,6 +516,7 @@ function base:loadSettings()
     self.debuffOrder = settings.debuffOrder
     self.customAbilities = settings.customAbilities or {}
     self.customOptions = settings.customOptions or {}
+    if doSave then self:saveSettings() end
 end
 
 function base:saveSettings()
@@ -742,7 +749,7 @@ end
 
 function base:debuff()
     if mq.TLO.Target.ID() == mq.TLO.Me.ID() or mq.TLO.Target.Type() ~= 'NPC' then return end
-    if assist.isFighting() then
+    if self:isEnabled('DEBUFFONPULL') or assist.isFighting() then
         if not debuff.castDebuffs() then
             if self:isEnabled('SLOWALL') then
                 if debuff.debuffOthers() then return true end
@@ -833,6 +840,9 @@ function base:wantBuffs()
                 table.insert(request, desiredBuff)
             end
         end
+    end
+    if constants.tankClasses[mq.TLO.Me.Class.ShortName()] and mq.TLO.Me.Combat() and allBuffs.HOT and (not mq.TLO.Me.Song(allBuffs.HOT)() or (mq.TLO.Me.Song(allBuffs.HOT).Duration() or 0) < 6000) then
+        table.insert(request, 'HOT')
     end
     return request
 end
@@ -976,7 +986,7 @@ function base:nowCast(args)
         local alias = args[2]:upper()
         local target = args[3]:lower()
         if sendTo == 'me' or sendTo == mq.TLO.Me.CleanName():lower() then
-            local spellToCast = self.spells[base:getAbilityForAlias(alias)] or self[alias:lower()]
+            local spellToCast = base:getAbilityForAlias(alias) or self[alias] or self[alias:lower()] or self.spells[alias:lower()]
             table.insert(self.requests, {requester=target, requested=spellToCast, expiration=timer:new(15000), tranquil=false, mgb=false})
         else
             local sendToSpawn = mq.TLO.Spawn('pc ='..sendTo)
@@ -988,7 +998,7 @@ function base:nowCast(args)
     elseif #args == 2 then
         local alias = args[1]:upper()
         local target = args[2]:lower()
-        local spellToCast = self.spells[base:getAbilityForAlias(alias)] or self[alias:lower()]
+        local spellToCast = base:getAbilityForAlias(alias) or self[alias] or self[alias:lower()] or self.spells[alias:lower()]--self.spells[base:getAbilityForAlias(alias)] or self[alias:lower()]
         if spellToCast then
             table.insert(self.requests, {requester=target, requested=spellToCast, expiration=timer:new(15000), tranquil=false, mgb=false})
         end

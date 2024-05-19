@@ -65,6 +65,7 @@ end
 
 function Rogue:initClassOptions()
     self:addOption('USEEVADE', 'Evade', true, nil, 'Hide and backstab on engage', 'checkbox', nil, 'UseEvade', 'bool')
+    self:addOption('USEEPIC', 'Use Epic', true, nil, 'Use epic as combat buff', 'checkbox', nil, 'UseEpic', 'bool')
 end
 
 Rogue.Abilities = {
@@ -135,6 +136,11 @@ Rogue.Abilities = {
         Options={first=true}
     },
 
+    {
+        Type='Item',
+        Name='Nightshade, Blade of Entropy',
+        Options={opt='USEEPIC', combatbuff=true, first=true}
+    },
     {
         Type='AA',
         Name='Envenomed Blades',
