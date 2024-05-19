@@ -654,6 +654,7 @@ function Ability:setSpellData()
         else
             itemRef = mq.TLO.FindItem('='..self.CastName)
         end
+        if not itemRef() then return end
 
         local itemSpellRef = itemRef.Spell
         local itemBlessingRef = itemRef.Blessing
@@ -724,13 +725,13 @@ function Ability:setCommonSpellData(spellRef)
     self.SpellType = spellRef.SpellType()
 
     if self.SpellType == 'Detrimental' then
-        if self.AERange > 0 then
-            if self.MyRange == 0 then
+        if (self.AERange or 0) > 0 then
+            if (self.MyRange or 0) == 0 then
                 self.MyRange = self.AERange
             end
         end
     else
-        if self.AERange > 0 then
+        if (self.AERange or 0) > 0 then
             self.MyRange = self.AERange
         end
     end

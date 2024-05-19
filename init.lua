@@ -148,6 +148,7 @@ local function doLooting()
                 movement.navToTarget(nil, 10000)
                 if (mq.TLO.Target.Distance3D() or 100) > 10 then return end
                 loot.lootMyCorpse()
+                if mq.TLO.Cursor() then mq.cmd('/autoinv') end
                 state.actionTaken = true
                 return
             end

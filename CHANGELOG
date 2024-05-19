@@ -13,6 +13,7 @@
 - Add champion and SE into buff begging
 - Update corpse rez event check for lazarus
 - Tweaks to healing logic
+- Avoid using group heals on ext target heals
 
 # 2024/04/21
 - Add SLOWALL option for shaman. May be buggy as it resist count tracking is based on current assist target only, so may screw up some if stuff resists
