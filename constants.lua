@@ -34,24 +34,30 @@ constants.commandHelp = {
     {command='docs', tip='Launches the documentation site in a browser window'},
     {command='wiki', tip='Launches the Lazarus wiki in a browser window'},
     {command='nowcast', tip='Tells the named character or yourself to cast a spell on the specified target ID.', example='/nowcast [name] alias <targetID>'},
+    {command='blockspells', tip='Block common spells on self and pet'},
+    {command='rez <name>', tip='Rez the specified character', example='/aqo rez sometank'},
+    {command='rezall', tip='Rez whole group or raid'},
     {command='baz', tip='Launches the Lazarus Bazaar in a browser window'},
 }
 
 constants.bufflines = {
     -- Standard Buffs
-    {key='AEGO', label='Aegolism (Cleric HP/AC)', category='Standard'},
-    {key='SYMBOL', label='Symbol (Cleric HP)', category='Standard'},
-    {key='SKIN', label='Skin (Druid HP)', category='Standard'},
+    {key='AEGO', label='Aegolism (Cleric HP/AC)', category='Standard', exclusivewith='SYMBOL, SKIN'},
+    {key='SYMBOL', label='Symbol (Cleric HP)', category='Standard', exclusivewith='AEGO'},
+    {key='SKIN', label='Skin (Druid HP)', category='Standard', exclusivewith='AEGO'},
     {key='FOCUS', label='Focus (Shaman HP)', category='Standard'},
     {key='HASTE', label='Haste', category='Standard'},
     {key='KEI', label='Clarity', category='Standard'},
-    {key='SHOUT', label='Shout (Ranger HP)', category='Standard'},
-    {key='BRELLS', label='Brells (Paladin HP)', category='Standard'},
-    {key='SV', label='SV (Beast Lord HP)', category='Standard'},
+    {key='SHOUT', label='Shout (Ranger Atk)', category='Standard'},
+    {key='STRENGTH', label='Strength (Ranger HP)', category='Standard', exclusivewith='BRELLS,SV'},
+    {key='BRELLS', label='Brells (Paladin HP)', category='Standard', exclusivewith='STRENGTH,SV'},
+    {key='SV', label='SV (Beast Lord HP)', category='Standard', exclusivewith='BRELLS,STRENGTH'},
     {key='SE', label='SE (Beast Lord Regen)', category='Standard'},
     -- {key='REGEN', label='Regen', category='Standard'},
     -- Stat Buffs
-    {key='CHAMPION', label='Champion', category='Stats'},
+    {key='CHAMPION', label='Champion (Shm)', category='Stats'},
+    {key='FEROCITY', label='Ferocit (Bst)y', category='Stats'},
+    {key='WOLF', label='Pact of Wolf (Shm)', category='Stats'},
     {key='STR', label='Strength', category='Stats'},
     {key='CHA', label='Charisma', category='Stats'},
     {key='DEX', label='Dexterity', category='Stats'},
@@ -87,14 +93,16 @@ constants.buffs = {
         FOCUS = true,
         HASTE = true,
         SHOUT = true,
+        STRENGTH = true,
         BRELLS = false,
         SV = false,
-        STR = true,
         DMF = true,
         DS = true,
         NECROTIC = false,
         REPTILE = false,
         CHAMPION = true,
+        WOLF = true,
+        FEROCITY = true,
     },
     BRD = {
         AEGO = false,
@@ -103,14 +111,15 @@ constants.buffs = {
         FOCUS = true,
         HASTE = true,
         SHOUT = true,
+        STRENGTH = true,
         BRELLS = false,
         SV = false,
-        STR = true,
         DMF = true,
         DS = true,
         NECROTIC = false,
         REPTILE = false,
         CHAMPION = true,
+        WOLF = true,
     },
     MNK = {
         AEGO = false,
@@ -119,14 +128,16 @@ constants.buffs = {
         FOCUS = true,
         HASTE = true,
         SHOUT = true,
+        STRENGTH = true,
         BRELLS = false,
         SV = false,
-        STR = true,
         DMF = true,
         DS = true,
         NECROTIC = false,
         REPTILE = false,
         CHAMPION = true,
+        WOLF = true,
+        FEROCITY = true,
     },
     ROG = {
         AEGO = false,
@@ -135,14 +146,16 @@ constants.buffs = {
         FOCUS = true,
         HASTE = true,
         SHOUT = true,
+        STRENGTH = true,
         BRELLS = false,
         SV = false,
-        STR = true,
         DMF = true,
         DS = true,
         NECROTIC = false,
         REPTILE = false,
         CHAMPION = true,
+        WOLF = true,
+        FEROCITY = true,
     },
 
     CLR = {
@@ -191,8 +204,8 @@ constants.buffs = {
         SKIN = false,
         HASTE = true,
         KEI = true,
-        SHOUT = false,
-        STR = true,
+        SHOUT = true,
+        STRENGTH = false,
         SV = false,
         FOCUS = true,
         NECROTIC = true,
@@ -203,6 +216,7 @@ constants.buffs = {
         VIE = true,
         SLOWPROC = true,
         CHAMPION = true,
+        WOLF = true,
     },
     SHD = {
         AEGO = true,
@@ -210,8 +224,8 @@ constants.buffs = {
         HASTE = true,
         KEI = true,
         BRELLS = true,
-        SHOUT = false,
-        STR = true,
+        SHOUT = true,
+        STRENGTH = false,
         SV = false,
         FOCUS = true,
         NECROTIC = true,
@@ -222,6 +236,7 @@ constants.buffs = {
         VIE = true,
         SLOWPROC = true,
         CHAMPION = true,
+        WOLF = true,
     },
     WAR = {
         AEGO = false,
@@ -230,7 +245,8 @@ constants.buffs = {
         HASTE = true,
         KEI = true,
         BRELLS = true,
-        SHOUT = false,
+        STRENGTH = false,
+        SHOUT = true,
         STR = true,
         SV = false,
         FOCUS = true,
@@ -242,6 +258,7 @@ constants.buffs = {
         VIE = true,
         SLOWPROC = true,
         CHAMPION = true,
+        WOLF = true,
     },
 
     ENC = {
@@ -311,12 +328,13 @@ constants.buffs = {
         FOCUS = true,
         SPELLHASTE = true,
         KEI = true,
-        STR = true,
         NECROTIC = true,
         REPTILE = true,
         DMF = true,
         DS = true,
         CHAMPION = true,
+        WOLF = true,
+        FEROCITY = true,
     },
     RNG = {
         SE = true,
@@ -331,6 +349,7 @@ constants.buffs = {
         DMF = true,
         DS = true,
         CHAMPION = true,
+        WOLF = true,
     },
 }
 
@@ -441,6 +460,27 @@ constants.uiThemes = {
         button = ImVec4(.5, .3, 0, 1),
         text = ImVec4(1, 1, 1, 1),
     },
+}
+
+constants.BLOCKSPELLS = {
+    3384, -- Talisman of the Tribunal
+    3242, -- Guard of Druzzil
+    3444, -- Protection of Seasons
+    1582, -- Talisman of the Serpent
+    10607, -- Illusion: War Pirate
+    21684, -- Form of the Black Wolf
+    27743, -- Illusion: Drachnid
+    30707, -- Pact of the Wolf Effect
+    36838, -- It's Levitation, But Fancier!
+}
+constants.BLOCKPETSPELLS = {
+    3384, -- Talisman of the Tribunal
+    3242, -- Guard of Druzzil
+    3444, -- Protection of Seasons
+    1582, -- Talisman of the Serpent
+    21684, -- Form of the Black Wolf
+    30707, -- Pact of the Wolf Effect
+    36838, -- It's Levitation, But Fancier!
 }
 
 return constants

@@ -1,3 +1,4 @@
+local mq = require('mq')
 local class = require('classes.classbase')
 local common = require('common')
 local state = require('state')
@@ -32,11 +33,16 @@ Berserker.Abilities = {
         Name='Braxi\'s Howl',
         Options={dps=true}
     },
+    {
+        Type='Skill',
+        Name='Frenzy',
+        Options={dps=true}
+    },
     { -- Frenzy Attack for 196 with 10000% Accuracy Mod (3), Cast: Overpowering Frenzy Effect (Increase Frenzy Damage Taken by 25%, Increase Throwing Damage Taken by 25%)
         Type='Disc',
         Group='frenzy',
         Names={'Eviscerating Frenzy', 'Oppressing Frenzy', 'Vindicating Frenzy', 'Mangling Frenzy', 'Vanquishing Frenzy', 'Demolishing Frenzy', 'Conquering Frenzy', 'Overwhelming Frenzy', --[[emu begin]] 'Overpowering Frenzy'},
-        Options={dps=true}
+        Options={dps=true, condition=function() return not mq.TLO.Target.Buff('Overpowering Frenzy Effect')() end}
     },
     { -- Throwing Attack for 592 with 10000% Accuracy Mod
         Type='Disc',
@@ -94,7 +100,7 @@ Berserker.Abilities = {
         Type='Disc',
         Group='scream',
         Names={'Bewildering Scream'},
-        Options={emu=true, dps=true}
+        Options={emu=true, dps=true, condition=function() return not mq.TLO.Target.Buff('Bewildering Scream')() end}
     },
 
     { -- AE Attack, 3 min cd, timer 1
@@ -173,11 +179,6 @@ Berserker.Abilities = {
         Name='Cascading Rage',
         Options={first=true}
     },
-    { -- overhaste + extra hits, 20 min cd, timer 5
-        Type='AA',
-        Name='Desperation',
-        Options={first=true}
-    },
     {
         Type='AA',
         Name='Silent Strikes',
@@ -193,6 +194,12 @@ Berserker.Abilities = {
         Name='Focused Furious Rampage',
         Options={first=true}
     },
+    {
+        Type='Disc',
+        Group='warcry',
+        Names={'Ancient: Cry of Chaos'},
+        Options={first=true, condition=function() return not mq.TLO.Me.Song('Ancient: Cry of Chaos')() end}
+    },
     -- Secondary Burn - Cleaving Acrimony, Reckless Abandon, Shaman Epic, Epic 2.0
     { -- Increase Hit Damage by 66%, 10 min cd, timer 18
         Type='AA',
@@ -205,10 +212,20 @@ Berserker.Abilities = {
         Names={'Cleaving Acrimony Discipline', 'Cleaving Anger Discipline'},
         Options={second=true}
     },
-    { -- emu only??
+    { -- emu only. enhance melee capabilities for group
         Type='AA',
-        Name='Cry of Battle',
+        Name='Fundament: Second Spire of Savagery',
         Options={emu=true, second=true}
+    },
+    -- { -- emu only?? MGB for warcry
+    --     Type='AA',
+    --     Name='Cry of Battle',
+    --     Options={emu=true, second=true}
+    -- },
+    {
+        Type='Item',
+        Name='Vengeful Taelosian Blood Axe',
+        Options={second=true}
     },
     -- Tertiary Burn - Avenging Flurry, Vehement Rage, Shaman Epic, Epic 2.0
     { -- Increase Chance of Additional 2H Attack by 125%, Increase Chance to Double Attack by 10000%, Decrease Weapon Delay by 20.3%, Increase Chance to Flurry by 16%
@@ -315,6 +332,16 @@ Berserker.Abilities = {
     },
 
     -- Defensives
+    { -- attack faster at lower HPs. overhaste + extra hits, 20 min cd, timer 5
+        Type='AA',
+        Name='Desperation',
+        Options={defensive=true}
+    },
+    { -- increased healing received but lowers damage
+        Type='AA',
+        Name='Hold the Line',
+        Options={}--defensive=true
+    },
     { -- absorb 50% of dmg done to target to heal self, 15 min cd, timer 16
         Type='AA',
         Name='Blood Sustenance',

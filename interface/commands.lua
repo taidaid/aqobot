@@ -308,6 +308,23 @@ function commands.commandHandler(...)
     elseif opt == 'ASSISTME' then
         state.tankMobID = mq.TLO.Target.ID()
         tank.callAssist()
+    elseif opt == 'BLOCKSPELLS' then
+        for _,spellid in ipairs(constants.BLOCKSPELLS) do
+            mq.cmdf('/blockspell add me %s', spellid)
+            mq.delay(1)
+        end
+        for _,spellid in ipairs(constants.BLOCKPETSPELLS) do
+            mq.cmdf('/blockspell add pet %s', spellid)
+            mq.delay(1)
+        end
+    elseif opt == 'REZ' then
+        mq.delay(3000, function() return not mq.TLO.Me.Casting() end)
+        if class.rezAbility and not mq.TLO.Me.Casting() then
+            mq.cmdf('/squelch /mqt pccorpse =%s', args[2])
+            class.rezAbility:use()
+        end
+    elseif opt == 'REZALL' then
+        class.massRez()
     else
         commands.classSettingsHandler(opt, new_value)
     end

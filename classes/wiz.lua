@@ -106,6 +106,16 @@ Wizard.Abilities = {
         Name='Mana Blaze',
         Options={first=true}
     },
+    {
+        Type='AA',
+        Name='Improved Twincast',
+        Options={first=true}
+    },
+    {
+        Type='Item',
+        Name='Staff of Phenomenal Power',
+        Options={first=true}
+    },
 
     -- Buffs
     {

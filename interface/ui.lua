@@ -572,6 +572,11 @@ local function drawBuffLists()
                         for _,buff in ipairs(constants.bufflines) do
                             if buff.category == category then
                                 class.desiredBuffs[buff.key] = ImGui.Checkbox(buff.label..' ['..buff.key..']'..'##desired', class.desiredBuffs[buff.key] or false)
+                                if buff.exclusivewith then
+                                    ImGui.Indent(30)
+                                    ImGui.Text('Does not stack with: %s', buff.exclusivewith)
+                                    ImGui.Unindent(30)
+                                end
                             end
                         end
                     end
@@ -741,10 +746,11 @@ local function drawClickyManager()
     if clickyManagerOpen then
         clickyManagerOpen, shouldDrawClickyManager = ImGui.Begin(('AQO Clickies##AQOBOTUI%s'):format(state.class), clickyManagerOpen)
         if shouldDrawClickyManager then
-            if ImGui.BeginTable('clickies', 3) then
+            if ImGui.BeginTable('clickies', 4) then
                 ImGui.TableSetupColumn('Enabled', ImGuiTableColumnFlags.None, 1)
                 ImGui.TableSetupColumn('Type', ImGuiTableColumnFlags.None, 1)
                 ImGui.TableSetupColumn('Name', ImGuiTableColumnFlags.None, 3)
+                ImGui.TableSetupColumn('Effect', ImGuiTableColumnFlags.None, 3)
                 ImGui.TableHeadersRow()
                 for clickyName, clicky in pairs(class.clickies) do
                     ImGui.TableNextRow()
@@ -758,6 +764,8 @@ local function drawClickyManager()
                     ImGui.Text(clicky.clickyType)
                     ImGui.TableNextColumn()
                     ImGui.Text(clickyName)
+                    ImGui.TableNextColumn()
+                    ImGui.Text('%s', mq.TLO.FindItem(clickyName).Clicky() or mq.TLO.FindItemBank(clickyName).Clicky())
                 end
                 ImGui.EndTable()
             end

@@ -70,7 +70,7 @@ Druid.SpellLines = {
     {
         Group='groupheal1',
         Spells={'Lunacea', 'Lunarush', 'Lunalesce', 'Lunasalve', 'Lunasoothe', 'Word of Reconstitution', 'Word of Restoration', 'Moonshadow'},
-        Options={Gem=3, group=true}
+        Options={Gem=3, group=true, grouppanic=true}
     },
     {
         Group='groupheal2',
@@ -259,7 +259,7 @@ Druid.Abilities = {
     {
         Type='AA',
         Name='Wrath of the Wild',
-        Options={singlebuff=true, classes={DRU=true,CLR=true,SHM=true,ENC=true,MAG=true,WIZ=true,RNG=true,MNK=true}}
+        Options={alias='BIGDS', singlebuff=true, classes={DRU=true,CLR=true,SHM=true,ENC=true,MAG=true,WIZ=true,RNG=true,MNK=true}}
     },
     {
         Type='AA',
@@ -275,6 +275,11 @@ Druid.Abilities = {
         Type='AA',
         Name='Preincarnation',
         Options={selfbuff=true}
+    },
+    {
+        Type='Item',
+        Name='Staff of Everliving Brambles',
+        Options={combatbuff=true}
     },
 
     -- Defensives

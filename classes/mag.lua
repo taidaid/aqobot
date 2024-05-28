@@ -356,7 +356,7 @@ Magician.SpellLines = {
     {Group='bodyguard', Spells={'Valorforged Bodyguard', 'Ophiolite Bodyguard', 'Pyroxenite Bodyguard', 'Rhylitic Bodyguard', 'Shieldstone Bodyguard'}, Options={}}, -- proc pet when hit
 
     -- old emu stuff
-    {Group='petstrbuff', Spells={'Rathe\'s Strength', 'Earthen Strength'}, Options={skipifbuff='Champion', petbuff=true}},
+    {Group='petstrbuff', Spells={'Rathe\'s Strength', 'Earthen Strength'}, Options={skipifbuff='Champion', petbuff=true, Checkfor='Rathe\'s Strength Effect:Permanent'}},
     {Group='bigds', Spells={'Frantic Flames', 'Pyrilen Skin', 'Burning Aura'}, Options={opt='USETEMPDS', singlebuff=true, classes={WAR=true,SHD=true,PAL=true}}},
     -- Chance to increase spell power of next nuke
     {Group='prenuke', Spells={'Fickle Conflagration', --[[emu cutoff]] 'Fickle Fire'}, Options={opt='USEFIRENUKES'}},
@@ -465,12 +465,12 @@ Magician.Abilities = {
     {
         Type='Item',
         Name='Focus of Primal Elements',
-        Options={petbuff=true, CheckFor='Elemental Conjunction'}
+        Options={first=true, CheckFor='Elemental Conjunction'}
     },
     {
         Type='Item',
         Name='Staff of Elemental Essence',
-        Options={petbuff=true, CheckFor='Elemental Conjunction'}
+        Options={first=true, CheckFor='Elemental Conjunction'}
     },
     {
         Type='AA',
@@ -652,7 +652,14 @@ function Magician:clearCursor()
     end
 end
 
+local codex = 'Codex of Minion\'s Materiel'
+local dsk = 'Glyphwielder\'s Ascendant Gloves of the Summoner'
 function Magician:armPets()
+    -- if mq.TLO.FindItem(codex)() then
+    --     self:armPetsCodex()
+    --     return
+    -- end
+
     if mq.TLO.Cursor() then self:clearCursor() end
     if mq.TLO.Cursor() then
         logger.info('Unable to clear cursor, not summoning pet toys.')
@@ -666,13 +673,20 @@ function Magician:armPets()
     local restoreGem3 = {Name=mq.TLO.Me.Gem(10)()}
     local restoreGem4 = {Name=mq.TLO.Me.Gem(9)()}
 
+    local havedsk = mq.TLO.FindItem(dsk)()
+
     local petPrimary = mq.TLO.Pet.Primary()
     local petID = mq.TLO.Pet.ID()
     if petID > 0 and petPrimary == 0 then
         state.armPet = petID
         state.armPetOwner = mq.TLO.Me.CleanName()
         local weapons = self.petWeapons.Self
+        if havedsk then weapons = 'corrupted|corrupted' end
         if weapons then
+            if mq.TLO.FindItem(codex)() then
+                mq.cmdf('/useitem "%s"', codex)
+                mq.delay(5000)
+            end
             self:armPet(petID, weapons, 'Me')
         end
     end
@@ -685,7 +699,10 @@ function Magician:armPets()
                 local ownerPetDistance = ownerSpawn.Pet.Distance3D() or 300
                 local ownerPetLevel = ownerSpawn.Pet.Level() or 0
                 local ownerPetPrimary = ownerSpawn.Pet.Primary() or -1
-                if ownerPetID > 0 and ownerPetDistance < 50 and ownerPetLevel > 0 and (ownerPetPrimary == 0 or ownerPetPrimary == EnchanterPetPrimaryWeaponId) then
+                if ownerPetID > 0 and ownerPetDistance < 50 and ownerPetLevel > 0 and (havedsk or ownerPetPrimary == 0 or ownerPetPrimary == EnchanterPetPrimaryWeaponId) then
+                    if havedsk then
+                        weapons = 'corrupted|corrupted'
+                    end
                     state.armPet = ownerPetID
                     state.armPetOwner = owner
                     mq.delay(2000, function() return self.spells.weapons:isReady() == abilities.IsReady.SHOULD_CAST end)
@@ -702,16 +719,22 @@ function Magician:armPets()
 end
 
 function Magician:armPetRequest(requester)
-    if not self.petWeapons then return end
-    local weapons = self.petWeapons[requester]
-    if not weapons then return end
+    local weapons = nil
+    local havedsk = mq.TLO.FindItem(dsk)()
+    if havedsk then
+        weapons = 'corrupted|corrupted'
+    else
+        if not self.petWeapons then return end
+        weapons = self.petWeapons[requester]
+        if not weapons then return end
+    end
     local ownerSpawn = mq.TLO.Spawn('pc ='..requester)
     if ownerSpawn() then
         local ownerPetID = ownerSpawn.Pet.ID()
         local ownerPetDistance = ownerSpawn.Pet.Distance3D() or 300
         local ownerPetLevel = ownerSpawn.Pet.Level() or 0
         local ownerPetPrimary = ownerSpawn.Pet.Primary() or -1
-        if ownerPetID > 0 and ownerPetDistance < 50 and ownerPetLevel > 0 and (ownerPetPrimary == 0 or ownerPetPrimary == EnchanterPetPrimaryWeaponId) then
+        if ownerPetID > 0 and ownerPetDistance < 50 and ownerPetLevel > 0 and (havedsk or ownerPetPrimary == 0 or ownerPetPrimary == EnchanterPetPrimaryWeaponId) then
             state.paused = true
             local restoreGem1 = {Name=mq.TLO.Me.Gem(12)()}
             local restoreGem2 = {Name=mq.TLO.Me.Gem(11)()}
@@ -772,11 +795,51 @@ function Magician:armPet(petID, weapons, owner)
     movement.navToLoc(myX, myY, myZ, nil, 2000)
 end
 
+function Magician:armPetsCodex()
+    local numPets = mq.TLO.SpawnCount('pcpet radius 100')()
+    for i=1,numPets do
+        local nearestpet = mq.TLO.NearestSpawn(i..',pcpet radius 100')
+        mq.cmdf('/mqt id %s', nearestpet.ID())
+        logger.info('Arming %s with codex', nearestpet.Name())
+        -- while not mq.TLO.Me.Casting() do
+        --     if mq.TLO.Me.ItemReady(codex)() then
+                -- logger.info('Casting codex on %s', nearestpet.Name())
+        mq.cmdf('/useitem "%s"', codex)
+        --     end
+        --     mq.delay(250)
+        -- end
+        mq.delay(3000)
+        -- while mq.TLO.Me.Casting() do
+        --     mq.delay(100)
+        -- end
+        -- mq.cmdf('/useitem "%s"', codex)
+        -- mq.delay(250)
+        -- if not mq.TLO.Me.ItemReady(codex)() then
+        logger.info('Done arming %s with codex', nearestpet.Name())
+        mq.delay(30000)
+        -- end
+    end
+end
+
 function Magician:giveWeapons(petID, weaponString)
     local weapons = helpers.split(weaponString, '|')
-    local primary = petToys.weapons[self.spells.weapons.BaseName][weapons[1]]
-    local secondary = petToys.weapons[self.spells.weapons.BaseName][weapons[2]]
+    local primary = ''
+    local secondary = ''
+    if weapons[1] == 'corrupted' then
+        primary = 'Summoned: Companion\'s Corrupted Dirk'
+        secondary = 'Summoned: Companion\'s Corrupted Dirk'
+    else
+        primary = petToys.weapons[self.spells.weapons.BaseName][weapons[1]]
+        secondary = petToys.weapons[self.spells.weapons.BaseName][weapons[2]]
+    end
     logger.info('weapons: %s %s', primary, secondary)
+    if weapons[1] == 'corrupted' then
+        mq.cmdf('/mqt id %s', petID)
+        mq.cmdf('/useitem "%s"', dsk)
+        mq.delay(500)
+        mq.delay(10000, function() return mq.TLO.Me.ItemReady(dsk)() end)
+        return true
+    end
 
     mq.cmdf('/mqt 0')
     if not self:checkForWeapons(primary, secondary) then

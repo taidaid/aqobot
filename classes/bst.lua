@@ -235,7 +235,7 @@ BeastLord.SpellLines = {
     },
     {Group='sow', Spells={'Spirit of Wolf'}, Options={}},
     -- below lvl 100
-    {Group='fero', Spells={'Ferocity of Irionu', 'Ferocity'}, Options={classes={WAR=true,MNK=true,BER=true,ROG=true}, selfbuff=function() return not BeastLord.spells.groupfero and true or false end}}, -- like shm avatar
+    {Group='fero', Spells={'Ferocity of Irionu', 'Ferocity'}, Options={alias='FEROCITY', petbuff=true, classes={WAR=true,MNK=true,BER=true,ROG=true}, selfbuff=function() return not BeastLord.spells.groupfero and true or false end}}, -- like shm avatar
     {Group='dispel', Spells={'Cancel Magic'}},
     --     --Spells(Group)
     --     self:addSpell('pet', {'Spirit of Shae', 'Spirit of Panthea', 'Spirit of Blizzent', 'Spirit of Akalit', 'Spirit of Avalit'})
@@ -463,12 +463,12 @@ BeastLord.Abilities = {
     {
         Type='Item',
         Name='Spiritcaller Totem of the Feral',
-        Options={petbuff=true, CheckFor='Might of the Wild Spirits', condition=conditions.missingPetCheckFor}
+        Options={first=true, CheckFor='Might of the Wild Spirits', condition=conditions.missingPetCheckFor}
     },
     {
         Type='Item',
         Name='Savage Lord\'s Totem',
-        Options={petbuff=true, CheckFor='Might of the Wild Spirits', condition=conditions.missingPetCheckFor}
+        Options={first=true, CheckFor='Might of the Wild Spirits', condition=conditions.missingPetCheckFor}
     },
     {
         Type='AA',

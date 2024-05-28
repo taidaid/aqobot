@@ -49,6 +49,8 @@ function Ranger:initClassOptions()
     self:addOption('USECOMPOSITE', 'Use Composite', true, nil, 'Cast composite as its available', 'checkbox', nil, 'UseComposite', 'bool')
     self:addOption('USESNARE', 'Use Snare', true, nil, 'Cast snare on mobs', 'checkbox', nil, 'UseSnare', 'bool')
     self:addOption('USEFADE', 'Use Fade', true, nil, 'Use Cover Tracks AA to reduce aggro', 'checkbox', nil, 'UseFade', 'bool')
+    self:addOption('USEWS', 'Use Weapon Shield', false, nil, 'Use Weapon Shield on aggro', 'checkbox', nil, 'UseWS', 'bool')
+    self:addOption('USEGROUPBURNS', 'Use Group Burns', true, nil, 'Toggle automatic use of Auspice and Group Guardian in burns', 'checkbox', nil, 'UseGroupBurns', 'bool')
 end
 
 Ranger.SpellLines = {
@@ -233,7 +235,12 @@ Ranger.Abilities = {
     {
         Type='AA',
         Name='Auspice of the Hunter',
-        Options={alias='AUSPICE'}-- first=true, 
+        Options={alias='AUSPICE', opt='USEGROUPBURNS', first=true}
+    },
+    { -- base dmg, atk, overhaste, 10min CD
+        Type='AA',
+        Name='Group Guardian of the Forest',
+        Options={alias='GUARDIAN', opt='USEGROUPBURNS', first=true}
     },
     { -- swarm pets, 15min CD
         Type='AA',
@@ -248,11 +255,6 @@ Ranger.Abilities = {
     { -- base dmg, atk, overhaste, 6min CD
         Type='AA',
         Name='Guardian of the Forest',
-        Options={first=true}
-    },
-    { -- base dmg, atk, overhaste, 10min CD
-        Type='AA',
-        Name='Group Guardian of the Forest',
         Options={first=true}
     },
     { -- base dmg, accuracy, atk, crit dmg, 5min CD
@@ -370,6 +372,12 @@ Ranger.Abilities = {
     },
 
     -- Defensives
+    {
+        Type='Disc',
+        Group='weaponshield',
+        Names={'Weapon Shield Discipline'},
+        Options={opt='USEWS', defensive=true, condition=function() return mq.TLO.Target.Named() end}
+    },
     { -- 7min cd, 85% avoidance, 10% absorb
         Type='AA',
         Name='Outrider\'s Evasion',

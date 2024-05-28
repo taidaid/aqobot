@@ -52,6 +52,7 @@ local function init()
     end
     mq.cmd('/pet ghold on')
     mq.cmd('/squelch /stick set verbflags 0')
+    mq.cmd('/squelch /stick set delaystrafe off')
     mq.cmd('/squelch /plugin melee unload noauto')
     mq.cmd('/squelch /rez accept on')
     mq.cmd('/squelch /rez pct 90')
@@ -114,10 +115,15 @@ end
 ---Remove harmful buffs such as lich if HP is getting low, regardless of paused state
 local torporLandedInCombat = false
 local function buffSafetyCheck()
-    if state.class == 'NEC' and mq.TLO.Me.PctHPs() < 40 and class.spells.lich then
-        mq.cmdf('/removebuff %s', class.spells.lich.Name)
-        if class.spells.flesh then
-            mq.cmdf('/removebuff %s', class.spells.flesh.Name)
+    if state.class == 'NEC' and mq.TLO.Me.PctHPs() < 40 then
+        if class.spells.lich then
+            mq.cmdf('/removebuff %s', class.spells.lich.Name)
+            if class.spells.flesh then
+                mq.cmdf('/removebuff %s', class.spells.flesh.Name)
+            end
+        end
+        if not mq.TLO.Me.Feigning() and not mq.TLO.Me.Sitting() and mq.TLO.Me.CombatState() ~= 'COMBAT' then
+            mq.cmd('/sit')
         end
     end
     if not torporLandedInCombat and mq.TLO.Me.Song('Transcendent Torpor')() and mq.TLO.Me.CombatState() == 'COMBAT' then

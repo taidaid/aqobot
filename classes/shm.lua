@@ -171,7 +171,7 @@ Shaman.SpellLines = {
     {-- group heal. Slot 7
         Group='recourse',
         Spells={'Grayleaf\'s Recourse', 'Rowain\'s Recourse', 'Zrelik\'s Recourse', 'Eyrzekla\'s Recourse', 'Krasir\'s Recourse', --[[emu cutoff]] 'Word of Reconstitution', 'Word of Restoration', 'Word of Health'},
-        Options={alias='GROUPHEAL', Gem=function() return Shaman:get('SPELLSET') == 'standard' and 7 or nil end, group=true, cure=true, Disease=true, Poison=true, Curse=true}
+        Options={alias='GROUPHEAL', Gem=function() return Shaman:get('SPELLSET') == 'standard' and 7 or nil end, group=true, cure=true, Disease=true, Poison=true, Curse=true, grouppanic=true}
     },
     {-- DPS spellset. Slot 7
         Group='poisonnuke',
@@ -505,7 +505,7 @@ Shaman.Abilities = {
     {
         Type='AA',
         Name='Group Pact of the Wolf',
-        Options={RemoveBuff='Pact of the Wolf Effect', singlebuff=true, classes={WAR=true,PAL=true,SHD=true}}
+        Options={RemoveBuff='Pact of the Wolf Effect', singlebuff=true, classes={WAR=true,PAL=true,SHD=true}, alias='WOLF'}
     },
 
     -- Debuffs

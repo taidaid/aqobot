@@ -200,10 +200,13 @@ function base:addCommonAbilities()
     else
         self.glyph = self:addAA('Glyph of Courage')
     end
-    table.insert(self.burnAbilities, self:addAA('Focus of Arcanum'))
-    table.insert(self.burnAbilities, self:addAA('Empowered Focus of Arcanum'))
-    table.insert(self.combatBuffs, self:addAA('Acute Focus of Arcanum', {skipifbuff='Enlightened Focus of Arcanum', combatbuff=true}))
-    table.insert(self.combatBuffs, self:addAA('Enlightened Focus of Arcanum', {skipifbuff='Acute Focus of Arcanum', combatbuff=true}))
+    if not state.emu then
+        table.insert(self.burnAbilities, self:addAA('Focus of Arcanum'))
+    else
+        table.insert(self.burnAbilities, self:addAA('Empowered Focus of Arcanum', {first=true}))
+        table.insert(self.combatBuffs, self:addAA('Acute Focus of Arcanum', {skipifbuff='Enlightened Focus of Arcanum', combatbuff=true}))
+        table.insert(self.combatBuffs, self:addAA('Enlightened Focus of Arcanum', {skipifbuff='Acute Focus of Arcanum', combatbuff=true}))
+    end
     for _,buffline in ipairs(constants.bufflines) do
         if self.desiredBuffs[buffline.key] == nil then
             self.desiredBuffs[buffline.key] = constants.buffs[mq.TLO.Me.Class.ShortName()][buffline.key]
@@ -620,6 +623,7 @@ function base:doCombatLoop(list, burn_type)
     local aggropct = target.PctAggro() or 100
     for _,ability in ipairs(list) do
         if (ability.Name or ability.ID) and (self:isAbilityEnabled(ability.opt)) and
+                (ability.condition == nil or ability:condition()) and
                 (ability.threshold == nil or ability.threshold <= state.mobCountNoPets) and
                 (ability.type ~= abilities.Types.Skill or dist < maxdist) and
                 (ability.maxdistance == nil or dist <= ability.maxdistance) and
@@ -868,16 +872,16 @@ function base:aggro()
     -- 1. Am i on aggro? Use fades or defensives immediately
     if mq.TLO.Target() and mq.TLO.Me.TargetOfTarget.ID() == mq.TLO.Me.ID() and mq.TLO.Target.Named() then
         local useDefensives = true
-        if self.useCommonListProcessor then
-            if common.processList(self.fadeAbilities, self, true) then return
-                -- if mq.TLO.Me.TargetOfTarget.ID() ~= mq.TLO.Me.ID() then
-                --     useDefensives = false
-                -- end
-            end
-            if useDefensives then
-                if common.processList(self.defensiveAbilities, self, true) then return end
-            end
-        else
+        -- if self.useCommonListProcessor then
+        --     if common.processList(self.fadeAbilities, self, true) then return
+        --         -- if mq.TLO.Me.TargetOfTarget.ID() ~= mq.TLO.Me.ID() then
+        --         --     useDefensives = false
+        --         -- end
+        --     end
+        --     if useDefensives then
+        --         if common.processList(self.defensiveAbilities, self, true) then return end
+        --     end
+        -- else
             for _,ability in ipairs(self.fadeAbilities) do
                 if self:isAbilityEnabled(ability.opt) then
                     if ability.precast then ability.precast() end
@@ -900,7 +904,7 @@ function base:aggro()
                     end
                 end
             end
-        end
+        -- end
     end
     -- 2. Is my aggro above some threshold? Use aggro reduction abilities
     if mq.TLO.Target() and pctAggro >= 70 then
@@ -916,6 +920,12 @@ function base:aggro()
             end
         end
         if self.aggroClass then self:aggroClass() end
+    end
+    if mq.TLO.Target() and mq.TLO.Me.TargetOfTarget.ID() == mq.TLO.Pet.ID() and mq.TLO.Target.Named() then
+        if mq.TLO.Me.AltAbilityReady('Divine Companion Aura')() and not mq.TLO.Me.Casting() then
+            mq.cmd('/alt act 1580')
+            mq.delay(250)
+        end
     end
 end
 
@@ -963,6 +973,10 @@ end
 
 function base:rez()
     if healing.rez(self.rezAbility) then state.actionTaken = true end
+end
+
+function base:massRez()
+    healing.massRez()
 end
 
 function base:managepet()

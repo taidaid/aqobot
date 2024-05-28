@@ -70,7 +70,7 @@ function Cleric:initClassOptions()
     self:addOption('USESTUN', 'Use Stun', true, nil, 'Toggle use of stuns', 'checkbox', nil, 'UseStun', 'bool')
     self:addOption('USENUKES', 'Use Nukes', false, nil, 'Toggle use of nukes', 'checkbox', nil, 'UseNukes', 'bool')
     -- use mark if mem'd in BYOS, otherwise use retort line to apply reverse DS with USERETORT
-    --self:addOption('USEDEBUFF', 'Use Reverse DS', true, nil, 'Toggle use of Mark reverse DS', 'checkbox', nil, 'UseDebuff', 'bool')
+    self:addOption('USEDEBUFF', 'Use Reverse DS', true, nil, 'Toggle use of Mark reverse DS', 'checkbox', nil, 'UseDebuff', 'bool')
     self:addOption('USESYMBOL', 'Use Symbol', false, nil, 'Toggle use of Symbol buff line', 'checkbox', nil, 'UseSymbol', 'bool')
     self:addOption('USERETORT', 'Use Retort', true, nil, 'Toggle use of Retort spell line', 'checkbox', nil, 'UseRetort', 'bool')
     self:addOption('USECURES', 'Use Cures', true, nil, 'Toggle use of cure spells', 'checkbox', nil, 'UseCures', 'bool')
@@ -146,18 +146,18 @@ Cleric.SpellLines = {
         Group='remedy',
         NumToPick=mq.TLO.Me.Level() < 101 and 1 or 2,
         Spells={'Avowed Remedy', 'Guileless Remedy', 'Sincere Remedy', 'Merciful Remedy', 'Spiritual Remedy', 'Graceful Remedy', 'Faithful Remedy', 'Earnest Remedy', --[[emu cutoff]] 'Sacred Remedy', 'Pious Remedy', 'Supernal Remedy', 'Remedy'},
-        Options={Gems={1,2}, tank=true, panic=true, regular=true}
+        Options={Gems={1,2}, regular=true}
     },
     {-- emu or before remedies standard heal. Slot 2, otherwise slot 11
         Group='lightheal',
         Spells={'Avowed Light', 'Fervent Light', 'Sincere Light', 'Merciful Light', 'Ardent Light', 'Reverent Light', 'Zealoud Light', 'Earnest Light', 'Devout Light', --[[emu cutoff]] 'Ancient: Hallowed Light', 'Pious Light', 'Holy Light', 'Divine Light', 'Healing Light', 'Superior Healing', 'Greater Healing', 'Healing', 'Light Healing', 'Minor Healing'},
-        Options={Gem=function(lvl) return lvl < 101 and 2 or 11 end, tank=true, panic=true, regular=true}
+        Options={Gem=function(lvl) return lvl < 101 and 2 or 11 end, tank=true, regular=true}
     },
     {-- Heal target + nuke targets target. Slot 3, 4
         Group='intervention',
         NumToPick=2,
         Spells={'Avowed Intervention', 'Atoned Intervention', 'Sincere Intervention', 'Merciful Intervention', 'Mystical Intervention', 'Virtuous Intervention', 'Elysian Intervention', 'Celestial Intervention', --[[emu cutoff]] },
-        Options={Gems={3,4}, tank=true, panic=true, regular=true}
+        Options={Gems={3,4}, tank=true, regular=true}
     },
     {-- Large heal after 18 seconds. Slot 5
         Group='promised',
@@ -197,7 +197,7 @@ Cleric.SpellLines = {
     {-- Regular group heal. Slot 9
         Group='grouphealquick',
         Spells={'Syllable of Acceptance', 'Syllable of Invigoration', 'Syllable of Soothing', 'Syllable of Mending', 'Syllable of Convalescence', 'Syllable of Renewal', --[[emu cutoff]]},
-        Options={Gem=8, threshold=3, regular=true, single=true, group=true, grouppanic=true, pct=70}
+        Options={Gem=8, threshold=3, regular=true, single=true, group=true, pct=70}
     },
     {-- Slot 10
         Group='composite',
@@ -286,7 +286,11 @@ Cleric.SpellLines = {
     {Group='hottank', Spells={--[[emu cutoff]] 'Pious Elixir', 'Holy Elixir', 'Celestial Healing', 'Celestial Health', 'Celestial Remedy'}, Options={Gem=function(lvl) return lvl <= 70 and 3 or nil end, opt='USEHOTTANK', hot=true}},
     {Group='hotdps', Spells={--[[emu cutoff]] 'Pious Elixir', 'Holy Elixir', 'Celestial Healing', 'Celestial Health', 'Celestial Remedy'}, Options={opt='USEHOTDPS', hot=true}},
     {Group='issuance', Spells={'Issuance of Heroism', 'Issuance of Conviction', 'Issuance of Sincerity', 'Issuance of Mercy', 'Issuance of Spirit', --[[emu cutoff]] }}, -- stationary ward heal, requires enemy on target
-    {Group='mark', Spells={'Mark of Thormir', 'Mark of Ezra', 'Mark of Wenglawks', 'Mark of Shandral', 'Mark of the Vicarum', 'Mark of the Blameless', 'Mark of the Righteous', 'Mark of Kings', 'Mark of Karn', 'Mark of Retribution'}, Options={opt='USEDEBUFF', debuff=true, Gem=function(lvl) return lvl <= 70 and 9 or nil end}},
+    {
+        Group='mark',
+        Spells={'Mark of Thormir', 'Mark of Ezra', 'Mark of Wenglawks', 'Mark of Shandral', 'Mark of the Vicarum', 'Mark of the Blameless', 'Mark of the Righteous', 'Mark of Kings', 'Mark of Karn', 'Mark of Retribution'},
+        Options={opt='USEDEBUFF', debuff=true, Gem=function(lvl) return lvl <= 70 and 9 or nil end, condition=function() return mq.TLO.Target.Named() end}
+    },
     {Group='yaulp', Spells={'Yaulp VI'}, Options={combat=true, ooc=false, opt='USEYAULP', selfbuff=true}},
     {Group='hammerpet', Spells={'Unswerving Hammer of Justice'}, Options={Gem=function(lvl) return lvl <= 70 and not Cleric:isEnabled('USESTUN') and 11 or nil end, opt='USEHAMMER'}},
     {Group='rgc', Spells={'Remove Greater Curse'}, Options={cure=true,Curse=true, Gem=function(lvl) return lvl <= 70 and 12 or nil end}},
@@ -316,6 +320,11 @@ Cleric.Abilities = {
         Type='AA',
         Name='Burst of Life',
         Options={heal=true, panic=true}
+    },
+    {
+        Type='AA',
+        Name='Beacon of Life',
+        Options={heal=true, grouppanic=true}
     },
     {
         Type='Item',
@@ -380,7 +389,7 @@ Cleric.Abilities = {
     },
     {
         Type='AA',
-        Name='Fundament: Second Spire of Divinity',
+        Name='Fundament: Third Spire of Divinity',
         Options={first=true}
     },
     { -- twincast heals
@@ -394,6 +403,11 @@ Cleric.Abilities = {
         Options={first=true}
     },
 
+    {
+        Type='AA',
+        Name='Divine Guardian',
+        Options={alias='DG', classes={WAR=true,SHD=true,PAL=true}, nodmz=true, combatbuffothers=true}
+    }
     -- dps burns
     -- {
     --     Type='AA',

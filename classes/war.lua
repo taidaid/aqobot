@@ -33,6 +33,7 @@ end
 function Warrior:initClassOptions()
     self:addOption('USEBATTLELEAP', 'Use Battle Leap', true, nil, 'Keep the Battle Leap AA Buff up', 'checkbox', nil, 'UseBattleLeap', 'bool')
     self:addOption('USEFORTITUDE', 'Use Fortitude', false, nil, 'Use Fortitude Discipline on burn', 'checkbox', nil, 'UseFortitude', 'bool')
+    self:addOption('USEDEFENSIVE', 'Use Defensive', false, nil, 'Use Defensive Discipline on burn', 'checkbox', nil, 'UseDefensive', 'bool')
     self:addOption('USEGRAPPLE', 'Use Grapple', true, nil, 'Use Grappling Strike AA', 'checkbox', nil, 'UseGrapple', 'bool')
     self:addOption('USEGRASP', 'Use Grasp', true, nil, 'Use Warlord\'s Grasp AA', 'checkbox', nil, 'UseGrasp', 'bool')
     self:addOption('USEPHANTOM', 'Use Phantom', false, nil, 'Use Phantom Aggressor pet discipline', 'checkbox', nil, 'UsePhantom', 'bool')
@@ -165,7 +166,12 @@ Warrior.Abilities = {
         Names={'Unconditional Attention', 'Unrelenting Attention', 'Unyielding Attention', 'Undivided Attention'},
         Options={tankburn=true, condition=conditions.withinMeleeDistance}
     },
-    --table.insert(self.tankBurnAbilities, common.getBestDisc({'Climactic Stand', 'Resolute Stand', 'Stonewall Discipline', 'Defensive Discipline'}, {overwritedisc=mash_defensive and mash_defensive.Name or nil}))
+    {
+        Type='Disc',
+        Group='defensive',
+        Names={'Climactic Stand', 'Resolute Stand', 'Stonewall Discipline', 'Defensive Discipline'},
+        Options={opt='USEDEFENSIVE', first=true, overwritedisc=function() return not state.emu and Warrior.defense and Warrior.defense.Name or nil end}
+    },
     {
         Type='Disc',
         Group='armorrunes',
@@ -245,7 +251,7 @@ Warrior.Abilities = {
         Type='Disc',
         Group='fortitude',
         Names={'Fortitude Discipline'},
-        Options={opt='USEFORTITUDE', overwritesdisc=Warrior.defense and Warrior.defense.name or nil}
+        Options={opt='USEFORTITUDE', first=true, overwritesdisc=Warrior.defense and Warrior.defense.name or nil}
     },
     {
         Type='Disc',

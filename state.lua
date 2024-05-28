@@ -143,6 +143,7 @@ function state.handleCastingState()
         mq.delay(300)
         mq.doevents()
         if not mq.TLO.Me.Casting() then
+            mq.cmd('/stick unpause')
             if state.fizzled or state.interrupted then
                 logger.info('Casting \ag%s\ax failed (Attempt %s)', state.casting.Name, state.castAttempts + 1)
                 local casting = state.casting

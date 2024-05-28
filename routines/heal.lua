@@ -207,6 +207,8 @@ local function getHeal(healAbilities, healType, whoToHeal, options, inGroup)
             end
         end
     end
+    if healType == HEAL_TYPES.PANIC then return getHeal(healAbilities, HEAL_TYPES.REGULAR, whoToHeal, options, inGroup) end
+    if healType == HEAL_TYPES.GROUPPANIC then return getHeal(healAbilities, HEAL_TYPES.GROUP, whoToHeal, options, inGroup) end
 end
 
 function healing.heal(healAbilities, options)
@@ -283,7 +285,36 @@ function healing.healSelf(healAbilities, options)
     end
 end
 
+local rezzedCorpses = {}
 local newCorpses = {}
+
+function healing.massRez()
+    local numCorpses = mq.TLO.SpawnCount('pccorpse radius 100')()
+    for i=1,numCorpses do
+        local corpse = mq.TLO.NearestSpawn(i..',pccorpse radius 100')
+        local corpseName = corpse.Name()
+        if corpseName then
+            corpseName = corpseName:gsub('\'s corpse.*', '')
+            if not rezzedCorpses[corpseName] and (config:get('REZGROUP') and mq.TLO.Group.Member(corpseName)()) or (config.get('REZRAID') and mq.TLO.Raid.Member(corpseName)()) then
+                corpse.DoTarget()
+                if mq.TLO.Target.Type() == 'Corpse' then
+                    mq.cmd('/keypress CONSIDER')
+                    mq.delay(300)
+                    mq.doevents('eventCannotRezNew')
+                    if not state.cannotRez then
+                        mq.cmd('/corpse')
+                        mq.delay(50)
+                        mq.delay(6000, function() return mq.TLO.Me.AltAbilityReady('Blessing of Resurrection')() end)
+                        mq.cmdf('/alt act %s', mq.TLO.Me.AltAbility('Blessing of Resurrection').ID())
+                        -- mq.cmdf('/gu rezzing %s', corpseName)
+                        mq.delay(6500)
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function doRezFor(rezAbility)
     local waitForZoning = true
     local corpse = mq.TLO.Spawn('pccorpse '..mq.TLO.Me.CleanName()..'\'s corpse radius 100')

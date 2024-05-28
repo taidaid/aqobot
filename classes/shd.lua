@@ -58,6 +58,7 @@ function ShadowKnight:initClassOptions()
     self:addOption('USETORRENT', 'Use Torrent', true, nil, 'Toggle use of torrent', 'checkbox', nil, 'UseTorrent', 'bool')
     self:addOption('USESWARM', 'Use Snare', true, nil, 'Toggle use of swarm pets', 'checkbox', nil, 'UseSwarm', 'bool')
     self:addOption('USEDEFLECTION', 'Use Deflection', false, nil, 'Toggle use of deflection discipline', 'checkbox', nil, 'UseDeflection', 'bool')
+    self:addOption('USEDEFENSIVE', 'Use Defensive', false, nil, 'Toggle use of other defensive disciplines', 'checkbox', nil, 'UseDefensive', 'bool')
     self:addOption('DONTCAST', 'Don\'t Cast', false, nil, 'Don\'t cast spells in combat', 'checkbox', nil, 'DontCast', 'bool')
     self:addOption('USEEPIC', 'Use Epic', true, nil, 'Use epic in burns', 'checkbox', nil, 'UseEpic', 'bool')
     self:addOption('USEDOTTAP', 'Use DoT Tap', false, nil, 'Use DoT lifetap', 'checkbox', nil, 'UseDotTap', 'bool')
@@ -269,12 +270,6 @@ ShadowKnight.Abilities = {
         Names={'Corrupted Guardian Discipline'},
         Options={}
     },
-    {
-        Type='Disc',
-        Group='deflection',
-        Names={'Deflection Discipline'},
-        Options={opt='USEDEFLECTION'}
-    },
     { -- yank mob to you
         Type='AA',
         Name='Hate\'s Attraction',
@@ -450,13 +445,13 @@ ShadowKnight.Abilities = {
         Type='Disc',
         Group='soulshield',
         Names={'Soul Shield', 'Ichor Guard'},
-        Options={},
+        Options={opt='USEDEFENSIVE', second=true, condition=function() return not ShadowKnight.rampart or not mq.TLO.Me.CombatAbilityReady(ShadowKnight.rampart.Name)() end},
     },
     {
         Type='Disc',
-        Group='rampart',
-        Names={'Rampart Discipline'},
-        Options={},
+        Group='deflection',
+        Names={'Rampart Discipline', 'Deflection Discipline'},
+        Options={opt='USEDEFLECTION', first=true},
     },
 }
 

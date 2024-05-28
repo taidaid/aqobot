@@ -74,7 +74,7 @@ Bard.SpellLines = {
     {-- frost dot. Slot 2
         Group='chantfrost',
         Spells={'Swarn\'s Chant of Frost', 'Sylra Fris\' Chant of Frost', 'Yelinak\'s Chant of Frost', 'Ekron\'s Chant of Frost', 'Kirchen\'s Chant of Frost', --[[emu cutoff]] 'Vulka\'s Chant of Frost', 'Tuyen\'s Chant of Ice', 'Tuyen\'s Chant of Frost'},
-        Options={opt='USEFROSTDOTS', Gem=2, CheckFor=state.emu and 'Chant of Frost'}
+        Options={opt='USEFROSTDOTS', Gem=function(lvl) return Bard:get('USEFIREDOTS') and 3 or 2 end, CheckFor=state.emu and 'Chant of Frost'}
     },
     {-- AC. Slot 3
         Group='spiteful',
@@ -89,7 +89,7 @@ Bard.SpellLines = {
     {-- fire dot. Slot 3
         Group='chantflame',
         Spells={'Kindleheart\'s Chant of Flame', 'Shak Dathor\'s Chant of Flame', 'Sontalak\'s Chant of Flame', 'Quinard\'s Chant of Flame', 'Nilsara\'s Chant of Flame', --[[emu cutoff]] 'Vulka\'s Chant of Flame', 'Tuyen\'s Chant of Fire', 'Tuyen\'s Chant of Flame'},
-        Options={opt='USEFIREDOTS', Gem=function(lvl) return (not Bard:get('USEFROSTDOTS') and 2) or 3 end, CheckFor=state.emu and 'Chant of Flame'}
+        Options={opt='USEFIREDOTS', Gem=2, CheckFor=state.emu and 'Chant of Flame'}
     },
     {-- melee dmg proc. Slot 4
         Group='suffering',
@@ -104,7 +104,12 @@ Bard.SpellLines = {
     {-- haste, atk, ds. Slot 6
         Group='warmarch',
         Spells={'War March of Nokk', 'War March of Centien Xi Va Xakra', 'War March of Radiwol', 'War March of Dekloaz', 'War March of Jocelyn', --[[emu cutoff]] 'War March of Muram', 'War March of the Mastruq', 'McVaxius\' Rousing Rondo', 'McVaxius\' Berserker Crescendo', 'Anthem de Arms', 'Chant of Battle'},
-        Options={Gem=6}
+        Options={Gem=function(lvl) return lvl ~= 70 and 6 or nil end}
+    },
+    {
+        Group='chantpoison',
+        Spells={'Marsin\'s Chant of Poison', 'Cruor\'s Chant of Poison', 'Malvus\'s Chant of Poison', 'Nexona\'s Chant of Poison', 'Serisaria\'s Chant of Poison', --[[emu cutoff]] 'Vulka\'s Chant of Poison', 'Tuyen\'s Chant of Venom', 'Tuyen\'s Chant of Poison'},
+        Options={opt='USEPOISONDOTS', Gem=function(lvl) return 6 end, CheckFor=state.emu and 'Chant of Venom'}
     },
     {-- spell shield, AC, dmg mitigation. Slot 7
         Group='sonata',
@@ -154,7 +159,6 @@ Bard.SpellLines = {
 
     {Group='aura', Spells={'Aura of Tenisbre', 'Aura of Pli Xin Liako', 'Aura of Margidor', 'Aura of Begalru', 'Aura of Maetanrus', --[[emu cutoff]] 'Aura of the Muse', 'Aura of Insight'}, Options={aurabuff=true, Gem=function(lvl) return state.emu and 12 or nil end}}, -- spell dmg, overhaste, flurry, triple atk
     {Group='insultpushback', Spells={'Eoreg\'s Insult', 'Sogran\'s Insult', 'Omorden\'s Insult', 'Travenro\'s Insult', 'Fjilnauk\'s Insult', --[[emu cutoff]] }, Options={opt='USEINSULTS'}}, -- synergy DD 2
-    {Group='chantpoison', Spells={'Marsin\'s Chant of Poison', 'Cruor\'s Chant of Poison', 'Malvus\'s Chant of Poison', 'Nexona\'s Chant of Poison', 'Serisaria\'s Chant of Poison', --[[emu cutoff]] 'Vulka\'s Chant of Poison', 'Tuyen\'s Chant of Venom', 'Tuyen\'s Chant of Poison'}, Options={opt='USEPOISONDOTS', CheckFor=state.emu and 'Chant of Venom'}},
     {Group='alliance', Spells={'Conjunction of Sticks and Stones', 'Coalition of Sticks and Stones', 'Covenant of Sticks and Stones', 'Alliance of Sticks and Stones'}},
 
     -- resonating barrier, new defensive stun proc?
@@ -372,7 +376,7 @@ Bard.Abilities = {
     {
         Type='AA',
         Name='Fading Memories',
-        Options={fade=true, opt='USEFADE', precast=function() mq.cmd('/attack off') end, postcast=function() mq.delay(1000) mq.cmd('/makemevis') mq.cmd('/attack on') end}
+        Options={fade=true, opt='USEFADE', precast=function() mq.cmd('/attack off') end, postcast=function() mq.delay(500) mq.cmd('/makemevis') mq.cmd('/attack on') end}
     },
 
     -- Recover

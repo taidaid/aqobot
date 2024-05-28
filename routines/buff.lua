@@ -64,7 +64,11 @@ local function buffAuras(base)
     for _,buff in ipairs(base.auras) do
         local buffName = buff.Name
         if state.subscription ~= 'GOLD' then buffName = buff.Name:gsub(' Rk%..*', '') end
-        if not mq.TLO.Me.Aura(buff.CheckFor)() and not mq.TLO.Me.Song(buffName)() then
+        -- if not mq.TLO.Me.Aura(1)() then
+        if not mq.TLO.Me.Song(buff.CheckFor)() and not mq.TLO.Me.Song(buffName)() then
+        -- if not mq.TLO.Me.Aura(buff.CheckFor)() and not mq.TLO.Me.Song(buffName)() then
+            -- mq.cmdf('/removeaura %s', mq.TLO.Me.Aura(1)())
+            -- mq.delay(1)
             if abilities.use(buff, base, true) then
                 -- some goofy emu servers have longer cast times than standard songs on bard auras.. hacky little workaround?
                 if state.class == 'BRD' and (buff.MyCastTime or 0) > 3000 then mq.delay(500+buff.MyCastTime, function() return not mq.TLO.Me.Casting() end) end

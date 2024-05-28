@@ -341,7 +341,11 @@ end
 function Spell:execute()
     logger.debug(logger.flags.ability.spell, 'ENTER Spell:execute \ag%s\ax', self.Name)
     local requiresTarget = self.TargetType == 'Single'
-    if state.class == 'BRD' then mq.cmd('/stopsong') mq.delay(1) end
+    if state.class == 'BRD' then
+        mq.cmd('/stopsong') mq.delay(1)
+    else
+        mq.cmd('/stick pause')
+    end
     if logger.flags.announce.spell then logger.info('Casting \ag%s\ax%s', self.Name, requiresTarget and (' on \at%s\ax'):format(mq.TLO.Target.CleanName()) or '') end
     mq.cmdf('/cast "%s"', self.Name)
     state.setCastingState(self)

@@ -60,6 +60,7 @@ function Rogue:init()
     self:initAbilities()
     self:addCommonAbilities()
 
+    mq.cmd('/blockspell add me 8003') -- Berserker Cry Havoc, doesn't stack with rog spire
     self.useCommonListProcessor = true
 end
 

@@ -36,7 +36,9 @@ function Monk:init()
 end
 
 function Monk:initClassOptions()
-    self:addOption('USEFADE', 'Use Feign Death', true, nil, 'Toggle use of Feign Death in combat', 'checkbox', nil, 'UseFade', 'bool')
+    self:addOption('USEFD', 'Use Feign Death', true, nil, 'Toggle Use of Feign Death to reduce aggro', 'checkbox', nil, 'UseFD', 'bool')
+    self:addOption('USEFADE', 'Use Imitate Death', true, nil, 'Toggle use of Imitate Death in combat', 'checkbox', nil, 'UseFade', 'bool')
+    self:addOption('USEIMPENETRABLE', 'Use Impenetrable', true, nil, 'Toggle use of Impenetrable Discipline in combat', 'checkbox', nil, 'UseFade', 'bool')
 end
 
 Monk.Abilities = {
@@ -158,11 +160,11 @@ Monk.Abilities = {
         Names={'Crane Stance'},
         Options={first=true}
     },
-    {
+    { -- doubles attack speed
         Type='Disc',
-        Group='heel',
-        Names={'Heel of Zagali', 'Heel of Kai', 'Heel of Kanji'},
-        Options={first=true}
+        Group='speedfocus',
+        Names={'Speed Focus Discipline'},
+        Options={second=true}
     },
     { -- large nuke, 10 min cd, should FD after
         Type='AA',
@@ -170,11 +172,11 @@ Monk.Abilities = {
         Options={first=true, condition=conditions.withinMeleeDistance}--dps=true,
     },
     -- 2nd burn
-    { -- doubles attack speed
+    { -- if another monks has faded
         Type='Disc',
-        Group='speedfocus',
-        Names={'Speed Focus Discipline'},
-        Options={second=true, condition=function() return not Monk.heel or not mq.TLO.Me.CombatAbilityReady(Monk.heel.Name)() end}
+        Group='palm',
+        Names={'Terrorpalm Discipline', 'Crystalpalm Discipline', 'Innerflame Discipline'},
+        Options={second=true, condition=function() return not Monk.speedfocus or not mq.TLO.Me.CombatAbilityReady(Monk.speedfocus.Name)() end}
     },
     { -- doubles number of primary hand attacks
         Type='AA',
@@ -187,11 +189,11 @@ Monk.Abilities = {
         Options={second=true, opt='USEAOE'}
     },
     -- 3rd burn
-    { -- if another monks has faded
+    {
         Type='Disc',
-        Group='palm',
-        Names={'Terrorpalm Discipline', 'Crystalpalm Discipline', 'Innerflame Discipline'},
-        Options={third=true, condition=function() return (not Monk.heel or not mq.TLO.Me.CombatAbilityReady(Monk.heel.Name)()) and (not Monk.speedfocus or not mq.TLO.Me.CombatAbilityReady(Monk.speedfocus.Name)()) end}
+        Group='heel',
+        Names={'Heel of Zagali', 'Heel of Kai', 'Heel of Kanji'},
+        Options={third=true, condition=function() return (not Monk.palm or not mq.TLO.Me.CombatAbilityReady(Monk.palm.Name)()) and (not Monk.speedfocus or not mq.TLO.Me.CombatAbilityReady(Monk.speedfocus.Name)()) end}
     },
     { -- inc dmg from melee, inc min dmg
         Type='AA',
@@ -242,9 +244,15 @@ Monk.Abilities = {
 
     -- Defensives
     {
+        Type='Disc',
+        Group='impenetrable',
+        Names={'Impenetrable Discipline'},
+        Options={opt='USEIMPENETRABLE', defensive=true, condition=function() return mq.TLO.Target.Named() end}
+    },
+    {
         Type='AA',
         Name='Imitate Death',
-        Options={fade=true, opt='USEFD', postcast=function() mq.delay(1000) mq.cmd('/stand') mq.cmd('/makemevis') end}
+        Options={fade=true, opt='USEFADE', postcast=function() mq.delay(1000) mq.cmd('/stand') mq.cmd('/makemevis') end}
     },
     {
         Type='Disc',
@@ -255,7 +263,7 @@ Monk.Abilities = {
     {
         Type='Skill',
         Name='Feign Death',
-        Options={aggroreducer=true, opt='USEFD', postcast=function() mq.delay(1000) mq.cmd('/stand') mq.cmd('/makemevis') end}
+        Options={aggroreducer=true, opt='USEFD', postcast=function() mq.delay(500) mq.cmd('/stand') mq.cmd('/makemevis') end}
     },
 
     -- Heals

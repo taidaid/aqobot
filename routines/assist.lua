@@ -139,7 +139,7 @@ function assist.shouldAssist(assist_target)
 end
 
 local sendPetTimer = timer:new(2000)
-local stickTimer = timer:new(1000)
+local stickTimer = timer:new(100)
 
 ---Reset common combat timers to 0.
 local function resetCombatTimers()
@@ -278,16 +278,14 @@ end
 
 function assist.engage()
     if mq.TLO.Navigation.Active() then mq.cmd('/squelch /nav stop') end
-    if mode.currentMode:getName() ~= 'manual' and not mq.TLO.Stick.Active() and stickTimer:expired() then
+    if mode.currentMode:getName() ~= 'manual' and not mq.TLO.Stick.Active() then--and stickTimer:expired() then
         mq.cmd('/squelch /face fast')
         -- pin, behindonce, behind, front, !front
         local maxRangeTo = mq.TLO.Target.MaxRangeTo() or 0
         if config.get('ASSIST') == 'manual' then
-            mq.cmdf('/squelch /stick snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
+            mq.cmdf('/squelch /stick hold snaproll moveback behind uw %s', math.min(maxRangeTo*.75, 25))
         else
-            mq.cmdf('/squelch /stick %s', config.get('STICKCOMMAND'))
-            -- mq.cmdf('/squelch /stick snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
-            -- mq.cmdf('/squelch /stick !front uw')
+            mq.cmdf('/squelch /stick hold snaproll behind moveback loose uw %s', config.get('STICKCOMMAND'), math.min(maxRangeTo*.75, 25))
         end
         stickTimer:reset()
     end
@@ -354,16 +352,14 @@ function assist.attack(skip_no_los)
     if mode.currentMode:getName() ~= 'manual' and not mq.TLO.Stick.Active() and stickTimer:expired() then
         mq.cmd('/squelch /face fast')
         -- pin, behindonce, behind, front, !front
-        --mq.cmd('/stick snaproll uw')
-        --mq.delay(200, function() return mq.TLO.Stick.Behind() and mq.TLO.Stick.Stopped() end)
         local maxRangeTo = mq.TLO.Target.MaxRangeTo() or 0
-        --mq.cmdf('/squelch /stick hold moveback behind %s uw', math.min(maxRangeTo*.75, 25))
+        mq.cmd('/stick snapproll uw')
+        mq.delay(500)
+        mq.delay(2000, function() return mq.TLO.Stick.Behind() and mq.TLO.Stick.Stopped() end)
         if config.get('ASSIST') == 'manual' then
-            mq.cmdf('/squelch /stick snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
+            mq.cmdf('/squelch /stick hold snaproll moveback behind uw %s', math.min(maxRangeTo*.75, 25))
         else
-            mq.cmdf('/squelch /stick %s', config.get('STICKCOMMAND'))
-            -- mq.cmdf('/squelch /stick hold snaproll moveback behind %s uw', math.min(maxRangeTo*.75, 25))
-            -- mq.cmdf('/squelch /stick !front uw')
+            mq.cmdf('/squelch /stick hold %s %s', config.get('STICKCOMMAND'), math.min(maxRangeTo*.75, 25))
         end
         stickTimer:reset()
     end
