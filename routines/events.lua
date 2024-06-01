@@ -31,6 +31,7 @@ function events.init(_class)
     mq.event('eventOMMMask', '#*#You feel a gaze of deadly power focusing on you#*#', events.eventOMMMask)
     mq.event('eventCannotRez', '#*#This corpse cannot be resurrected#*#', events.cannotRez)
     mq.event('eventCannotRezNew', '#*#This corpse has already accepted a resurrection#*#', events.cannotRez)
+    mq.event('eventCanRez', '#*#This corpse\'s resurrection time will expire in', events.canRez)
     mq.event('eventFizzles', 'Your #*#spell fizzles#*#', events.fizzled)
     mq.event('eventMissedNote', 'You miss a note, bringing your song to a close#*#', events.fizzled)
     mq.event('eventInterrupt', 'Your spell is interrupted#*#', events.interrupted)
@@ -234,6 +235,10 @@ end
 
 function events.cannotRez()
     state.cannotRez = true
+end
+
+function events.canRez()
+    state.cannotRez = false
 end
 
 function events.fizzled()

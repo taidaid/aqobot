@@ -59,9 +59,9 @@ local function cureEnabled(options, key)
     return options[key] == nil or options[key].value
 end
 
-local function getCure(cures, cureType, cureCounters, options)
+local function getCure(cures, cureType, cureCounters, options, inGroup)
     for _,cureAbility in ipairs(cures) do
-        if ((cureCounters and cureAbility[cureType]) or (cureCounters and cureAbility.all) or cureAbility.ignoreCounters) and cureEnabled(options, cureAbility.opt) then
+        if ((cureCounters and cureAbility[cureType]) or (cureCounters and cureAbility.all) or cureAbility.ignoreCounters) and cureEnabled(options, cureAbility.opt) and (inGroup or not cureAbility.group) then
             if cureAbility.CastType == abilities.Types.Spell then
                 if mq.TLO.Me.SpellReady(cureAbility.Name)() then
                     return cureAbility
@@ -80,10 +80,12 @@ function cure:doCures(base)
     for name, charState in pairs(state.actors) do
         local buffs = charState.Buffs
         if buffs then
-            for _,buff in ipairs(buffs) do
-                if mq.TLO.Spawn(('pc =%s'):format(name)).Distance3D() or 300 <= 100 then
+            local inGroup = mq.TLO.Group.Member(name)()
+            local distance = mq.TLO.Spawn(('pc =%s'):format(name)).Distance3D() or 300
+            if distance <= 100 then
+                for _,buff in ipairs(buffs) do
                     --local originalTarget = mq.TLO.Target.ID()
-                    local cureAbility = getCure(base.cures, buff.CounterType, buff.CounterNumber, base.options)
+                    local cureAbility = getCure(base.cures, buff.CounterType, buff.CounterNumber, base.options, inGroup)
                     if cureAbility then
                         --logger.info('%s needs cure for %s counterType=%s counterNumber=%s, using %s', name, buff.Name, buff.CounterType, buff.CounterNumber, cureAbility.Name)
                         if cureAbility.TargetType == 'Single' then

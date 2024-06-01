@@ -153,7 +153,7 @@ local function getHurt(options)
         for i=1,mq.TLO.Me.XTargetSlots() do
             local xtarSpawn = mq.TLO.Me.XTarget(i)
             local xtarType = xtarSpawn.Type()
-            if xtarType == 'PC' or xtarType == 'Pet' then
+            if xtarType == 'PC' or xtarType == 'Pet' and xtarSpawn.TargetType() ~= 'Auto Hater' then
                 local xtargetHP = xtarSpawn.PctHPs() or 100
                 local xtarDistance = xtarSpawn.Distance3D() or 300
                 if xtargetHP < config.get('HOTHEALPCT') and xtarDistance < 200 then
@@ -297,10 +297,13 @@ function healing.massRez()
             corpseName = corpseName:gsub('\'s corpse.*', '')
             if not rezzedCorpses[corpseName] and (config:get('REZGROUP') and mq.TLO.Group.Member(corpseName)()) or (config.get('REZRAID') and mq.TLO.Raid.Member(corpseName)()) then
                 corpse.DoTarget()
+                mq.delay(100)
                 if mq.TLO.Target.Type() == 'Corpse' then
                     mq.cmd('/keypress CONSIDER')
-                    mq.delay(300)
+                    mq.delay(500)
                     mq.doevents('eventCannotRezNew')
+                    mq.doevents('eventCanRez')
+                    mq.delay(100)
                     if not state.cannotRez then
                         mq.cmd('/corpse')
                         mq.delay(50)
@@ -309,6 +312,7 @@ function healing.massRez()
                         -- mq.cmdf('/gu rezzing %s', corpseName)
                         mq.delay(6500)
                     end
+                    state.cannotRez = false
                 end
             end
         end

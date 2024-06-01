@@ -52,7 +52,10 @@ local function init()
     end
     mq.cmd('/pet ghold on')
     mq.cmd('/squelch /stick set verbflags 0')
-    mq.cmd('/squelch /stick set delaystrafe off')
+    -- mq.cmd('/squelch /stick set delaystrafe off')
+    mq.cmd('/squelch /stick set delaystrafe on')
+    mq.cmd('/squelch /stick set strafemindelay 500')
+    mq.cmd('/squelch /stick set strafemaxdelay 1000')
     mq.cmd('/squelch /plugin melee unload noauto')
     mq.cmd('/squelch /rez accept on')
     mq.cmd('/squelch /rez pct 90')
@@ -85,6 +88,9 @@ local function checkTarget()
         elseif mq.TLO.Me.AutoFire() then
             mq.cmd('/autofire off')
         end
+        if mq.TLO.Stick.Active() then
+            mq.cmd('/squelch /stick off')
+        end
         if targetType == 'Corpse' then
             if clearTargetTimer.start_time == 0 then
                 -- clearing target in 3 seconds
@@ -99,9 +105,6 @@ local function checkTarget()
     elseif targetType == 'Pet' or targetType == 'PC' then
         state.assistMobID = 0
         state.tankMobID = 0
-        if mq.TLO.Stick.Active() then
-            mq.cmd('/squelch /stick off')
-        end
         if mq.TLO.Me.Combat() then mq.cmd('/attack off') end
     end
 end
@@ -135,6 +138,9 @@ local function buffSafetyCheck()
     end
     if state.class == 'MNK' and mq.TLO.Me.PctHPs() < config.get('HEALPCT') and mq.TLO.Me.AbilityReady('Mend')() then
         mq.cmd('/doability mend')
+    end
+    if mq.TLO.Me.Buff('Resurrection Sickness')() and mq.TLO.Me.Aura(1)() then
+        mq.cmdf('/removeaura %s', mq.TLO.Me.Aura(1)())
     end
 end
 

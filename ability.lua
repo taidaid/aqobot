@@ -225,7 +225,7 @@ function Ability.canUseSpell(spell, spellTable, skipReagentCheck)
         end
     end
     if state.class ~= 'BRD' then
-        if mq.TLO.Me.Casting() or mq.TLO.Me.Moving() then
+        if mq.TLO.Me.Casting() or ((spellTable.MyCastTime or 0) > 0 and mq.TLO.Me.Moving()) then
             logger.debug(logger.flags.ability.validation, 'Not in control or moving (id=%s, name=%s, type=%s)', spell.ID(), spell.Name(), abilityType)
             return IsReady.BUSY
         end

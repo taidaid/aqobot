@@ -56,7 +56,7 @@ constants.bufflines = {
     -- {key='REGEN', label='Regen', category='Standard'},
     -- Stat Buffs
     {key='CHAMPION', label='Champion (Shm)', category='Stats'},
-    {key='FEROCITY', label='Ferocit (Bst)y', category='Stats'},
+    {key='FEROCITY', label='Ferocit (Bst)', category='Stats'},
     {key='WOLF', label='Pact of Wolf (Shm)', category='Stats'},
     {key='STR', label='Strength', category='Stats'},
     {key='CHA', label='Charisma', category='Stats'},

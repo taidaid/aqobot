@@ -285,7 +285,8 @@ function assist.engage()
         if config.get('ASSIST') == 'manual' then
             mq.cmdf('/squelch /stick hold snaproll moveback behind uw %s', math.min(maxRangeTo*.75, 25))
         else
-            mq.cmdf('/squelch /stick hold snaproll behind moveback loose uw %s', config.get('STICKCOMMAND'), math.min(maxRangeTo*.75, 25))
+            -- mq.cmdf('/squelch /stick hold snaproll behind moveback loose uw %s', math.min(maxRangeTo*.75, 25))
+            mq.cmdf('/squelch /stick hold %s %s', config.get('STICKCOMMAND'), math.min(maxRangeTo*.75, 25))
         end
         stickTimer:reset()
     end
@@ -360,6 +361,7 @@ function assist.attack(skip_no_los)
             mq.cmdf('/squelch /stick hold snaproll moveback behind uw %s', math.min(maxRangeTo*.75, 25))
         else
             mq.cmdf('/squelch /stick hold %s %s', config.get('STICKCOMMAND'), math.min(maxRangeTo*.75, 25))
+            -- mq.cmdf('/squelch /stick hold snaproll behind moveback loose uw %s', math.min(maxRangeTo*.75, 25))
         end
         stickTimer:reset()
     end
@@ -379,12 +381,12 @@ end
 ---Send pet and swarm pets against the assist target if assist conditions are met.
 function assist.sendPet()
     local targethp = mq.TLO.Target.PctHPs()
-    if sendPetTimer:expired() and targethp and targethp <= config.get('AUTOASSISTAT') then
-        if assist.isFighting() then
+    if assist.isFighting() then
+        if class.summoncompanion and mq.TLO.Pet.ID() > 0 and helpers.distance(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Pet.X(), mq.TLO.Pet.Y()) > 625 then
+            class.summoncompanion:use()
+        end
+        if sendPetTimer:expired() and targethp and targethp <= config.get('AUTOASSISTAT') then
             if mq.TLO.Pet.ID() > 0 and mq.TLO.Pet.Target.ID() ~= mq.TLO.Target.ID() and not state.petDontAttack then
-                if class.summoncompanion and helpers.distance(mq.TLO.Me.X(), mq.TLO.Me.Y(), mq.TLO.Pet.X(), mq.TLO.Pet.Y()) > 625 then
-                    class.summoncompanion:use()
-                end
                 mq.cmd('/multiline ; /pet attack ; /pet swarm')
             else
                 mq.cmd('/pet swarm')

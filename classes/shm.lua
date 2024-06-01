@@ -138,9 +138,10 @@ Shaman.SpellLines = {
         NumToPick=2,
         Spells={'Gelid Gift', 'Polar Gift', 'Wintry Gift', 'Frostbitten Gift', 'Glacial Gift', 'Frostfall Boon'},
         Options={
-            opt='USENUKES',
+            -- heal=true, tank=true,
+            -- opt='USENUKES',
             Gems={4,function() return Shaman:get('SPELLSET') ~= 'dps' and not Shaman:isEnabled('USEGROWTH') and 6 or nil end},
-            precast = function() mq.cmdf('/mqtar id %s', mq.TLO.Group.MainTank.ID() or config.get('CHASETARGET')) end
+            -- precast = function() mq.cmdf('/mqtar id %s', mq.TLO.Group.MainTank.ID() or config.get('CHASETARGET')) end
         },
     },
     {-- group heal, lower hp == stronger heal. Slot 5
@@ -395,17 +396,17 @@ function Shaman:initSpellRotations()
     table.insert(self.spellRotations.standard, self.spells.breathdot)
     table.insert(self.spellRotations.standard, self.spells.nectardot)
     table.insert(self.spellRotations.standard, self.spells.cursedot)
-    table.insert(self.spellRotations.standard, self.spells.tcnuke1)
+    -- table.insert(self.spellRotations.standard, self.spells.tcnuke1)
     table.insert(self.spellRotations.standard, self.spells.bitenuke)
-    table.insert(self.spellRotations.standard, self.spells.tcnuke2)
+    -- table.insert(self.spellRotations.standard, self.spells.tcnuke2)
 
     table.insert(self.spellRotations.hybrid, self.spells.chaotic)
     table.insert(self.spellRotations.hybrid, self.spells.breathdot)
     table.insert(self.spellRotations.hybrid, self.spells.nectardot)
     table.insert(self.spellRotations.hybrid, self.spells.cursedot)
-    table.insert(self.spellRotations.hybrid, self.spells.tcnuke1)
+    -- table.insert(self.spellRotations.hybrid, self.spells.tcnuke1)
     table.insert(self.spellRotations.hybrid, self.spells.bitenuke)
-    table.insert(self.spellRotations.hybrid, self.spells.tcnuke2)
+    -- table.insert(self.spellRotations.hybrid, self.spells.tcnuke2)
     table.insert(self.spellRotations.hybrid, self.spells.poisonnuke)
     table.insert(self.spellRotations.hybrid, self.spells.icenuke)
 
@@ -415,7 +416,7 @@ function Shaman:initSpellRotations()
     table.insert(self.spellRotations.dps, self.spells.pandemiccombo)
     table.insert(self.spellRotations.dps, self.spells.malodot)
     table.insert(self.spellRotations.dps, self.spells.cursedot)
-    table.insert(self.spellRotations.dps, self.spells.tcnuke1)
+    -- table.insert(self.spellRotations.dps, self.spells.tcnuke1)
     table.insert(self.spellRotations.dps, self.spells.bitenuke)
     table.insert(self.spellRotations.dps, self.spells.poisonnuke)
     table.insert(self.spellRotations.dps, self.spells.icenuke)

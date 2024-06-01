@@ -185,7 +185,7 @@ local function buffOOC(base)
     common.checkItemBuffs()
     if mq.TLO.SpawnCount('pccorpse radius 25')() > 0 then return false end
     -- find an actual buff spell that takes time to cast
-    if buffAuras(base) then return true end
+    if not mq.TLO.Me.Buff('Resurrection Sickness')() and buffAuras(base) then return true end
     if buffSelf(base) then return true end
     if buffActors(base) then return true end
     -- if buffSingle(base) then return true end
